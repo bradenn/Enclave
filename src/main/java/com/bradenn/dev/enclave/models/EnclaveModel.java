@@ -64,7 +64,11 @@ public class EnclaveModel {
 
     public UUID getOwner() {
         Document enclaveDoc = collection.find(Filters.eq("uuid", enclaveUUID.toString())).first();
-        return UUID.fromString(Objects.requireNonNull(enclaveDoc).getString("owner"));
+        if(enclaveDoc != null) {
+            return UUID.fromString(Objects.requireNonNull(enclaveDoc).getString("owner"));
+        }else{
+            return null;
+        }
     }
 
 

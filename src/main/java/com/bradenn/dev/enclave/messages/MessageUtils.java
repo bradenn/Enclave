@@ -17,4 +17,8 @@ public class MessageUtils {
         player.sendMessage(getPrefix() + format(message));
     }
 
+    public static void sendMessageWithoutPrefix(Player player, String message){
+        player.sendMessage(ChatColor.of("#8C8C8C") + format(message));
+    }
+
 }

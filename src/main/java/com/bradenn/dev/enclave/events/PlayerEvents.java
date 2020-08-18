@@ -19,7 +19,7 @@ public class PlayerEvents implements Listener {
     public void onChat(AsyncPlayerChatEvent e) {
         PlayerModel pm = new PlayerModel(e.getPlayer().getUniqueId());
         if (pm.getEnclave() != null) {
-            e.getPlayer().sendMessage(pm.getEnclave().getName());
+            e.setFormat(pm.getEnclave().getName() + " %s§6: §7%s");
         }else{
             e.getPlayer().sendMessage("You have no enclave bb");
         }

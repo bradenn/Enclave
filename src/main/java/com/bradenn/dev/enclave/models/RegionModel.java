@@ -61,5 +61,13 @@ public class RegionModel {
         collection.insertOne(chunkDoc);
     }
 
+    public void unclaimChunk(UUID enclave) {
+        Document chunkDoc = new Document("x", chunk.getX())
+                .append("z", chunk.getZ())
+                .append("world", world.getName())
+                .append("enclave", enclave.toString());
+        collection.findOneAndDelete(chunkDoc);
+    }
+
 
 }
