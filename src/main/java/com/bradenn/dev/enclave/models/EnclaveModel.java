@@ -1,6 +1,7 @@
 package com.bradenn.dev.enclave.models;
 
 import com.bradenn.dev.enclave.persistent.Database;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
@@ -39,23 +40,43 @@ public class EnclaveModel {
         collection.insertOne(enclaveDoc);
     }
 
+    public void disbandEnclave(){
+        collection.findOneAndDelete(new Document("uuid", enclaveUUID.toString()));
+        MongoCollection<Document> regions = db.getCollection("regions");
+        FindIterable<Document> regionDocs = regions.find(Filters.eq("enclave", enclaveUUID.toString()));
+        for(Document d : regionDocs){
+            regions.findOneAndUpdate(d, Updates.set("enclave", null));
+        }
+        MongoCollection<Document> players = db.getCollection("players");
+        FindIterable<Document> playerDocs = players.find(Filters.eq("enclave", enclaveUUID.toString()));
+        for(Document p : playerDocs){
+            regions.findOneAndUpdate(p, Updates.set("enclave", null));
+        }
+    }
+
+    public UUID getUUID(){
+        return enclaveUUID;
+    }
+
     public void setOwner(UUID uuid) {
         collection.findOneAndUpdate(new Document("uuid", enclaveUUID.toString()), Updates.set("owner", uuid.toString()));
     }
 
     public UUID getOwner() {
         Document enclaveDoc = collection.find(Filters.eq("uuid", enclaveUUID.toString())).first();
-        return UUID.fromString(enclaveDoc.getString("owner"));
+        return UUID.fromString(Objects.requireNonNull(enclaveDoc).getString("owner"));
     }
 
+
     public void setName(String name) {
-        collection.findOneAndUpdate(new Document("uuid", enclaveUUID.toString()), Updates.set("color", color));
+        collection.findOneAndUpdate(new Document("uuid", enclaveUUID.toString()), Updates.set("name", name));
     }
 
     public String getName() {
         Document enclaveDoc = collection.find(Filters.eq("uuid", enclaveUUID.toString())).first();
-        return enclaveDoc.getString("name");
+        return Objects.requireNonNull(enclaveDoc).getString("name");
     }
+
 
     public void setColor(String color) {
         collection.findOneAndUpdate(new Document("uuid", enclaveUUID.toString()), Updates.set("color", color));
@@ -63,7 +84,7 @@ public class EnclaveModel {
 
     public String getColor() {
         Document enclaveDoc = collection.find(Filters.eq("uuid", enclaveUUID.toString())).first();
-        return enclaveDoc.getString("color");
+        return Objects.requireNonNull(enclaveDoc).getString("color");
     }
 
 }

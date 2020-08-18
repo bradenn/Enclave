@@ -11,6 +11,7 @@ import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class PlayerModel {
@@ -35,11 +36,7 @@ public class PlayerModel {
 
     public EnclaveModel getEnclave() {
         Document playerDoc = collection.find(Filters.eq("uuid", playerUUID.toString())).first();
-        if(playerDoc.getString("enclave") != null) {
-            return new EnclaveModel(UUID.fromString(playerDoc.getString("enclave")));
-        }else{
-            return null;
-        }
+        return new EnclaveModel(UUID.fromString(Objects.requireNonNull(playerDoc).getString("enclave")));
     }
 
     public String getUsername() {
@@ -49,7 +46,7 @@ public class PlayerModel {
     public UUID getPlayerUUID() {
         return playerUUID;
     }
-    
+
     public Player getOnlinePlayer() {
         return Bukkit.getPlayer(playerUUID);
     }
