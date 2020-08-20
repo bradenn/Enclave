@@ -5,6 +5,13 @@ import org.bukkit.entity.Player;
 
 public class MessageUtils {
 
+    // ACCENT FE881E
+    // GREEN 45d14f
+    // RED eb5f55
+    // Dark Grey 555555
+    // Text 8C8C8C
+
+
     public static String format(String s){
         return ChatColor.translateAlternateColorCodes('&', s);
     }
@@ -14,6 +21,10 @@ public class MessageUtils {
     }
 
     public static void sendMessage(Player player, String message){
+        player.sendMessage(getPrefix() + format(message));
+    }
+
+    public static void sendMessage(Player player, String message, boolean success){
         player.sendMessage(getPrefix() + format(message));
     }
 

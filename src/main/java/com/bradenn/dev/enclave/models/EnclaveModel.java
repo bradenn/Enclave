@@ -6,9 +6,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
-import org.bson.BasicBSONObject;
 import org.bson.BsonArray;
-import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -16,20 +14,26 @@ import java.util.*;
 
 public class EnclaveModel {
 
-    private UUID enclaveUUID;
-    private List<String> members;
+    private final UUID enclaveUUID;
 
     MongoDatabase db = Database.getDatabase();
     MongoCollection<Document> collection = db.getCollection("enclaves");
 
-    // Get existing enclave
+    /**
+     * Find Enclave model
+     * @param uuid
+     */
     public EnclaveModel(UUID uuid) {
-        Document enclaveDoc = collection.find(Filters.eq("uuid", uuid.toString())).first();
         enclaveUUID = uuid;
     }
 
-    // Create a new enclave
+    /**
+     * Create model model
+     * @param uuid
+     * @param name
+     */
     public EnclaveModel(UUID uuid, String name) {
+        List<String> members;
         members = new ArrayList<>();
         members.add(uuid.toString());
         enclaveUUID = UUID.randomUUID();
@@ -43,6 +47,19 @@ public class EnclaveModel {
         collection.insertOne(enclaveDoc);
     }
 
+    /**
+     * Check if the instance exists in the database
+     * @return boolean
+     */
+    public boolean isValid(){
+        return collection.find(new Document("uuid", enclaveUUID.toString())).first() != null;
+    }
+
+    /**
+     * Check if the provided UUID belongs to the Enclave owner
+     * @param playerUUID
+     * @return boolean
+     */
     public boolean isOwner(UUID playerUUID){
         Bson query = Filters.and(
                 Filters.eq("uuid", enclaveUUID.toString()),
@@ -51,6 +68,9 @@ public class EnclaveModel {
         return ownerDoc != null;
     }
 
+    /**
+     * Upon disbanding the enclave, remove all claims from regions, remove all reference from players in guild
+     */
     public void disbandEnclave(){
         collection.findOneAndDelete(new Document("uuid", enclaveUUID.toString()));
         MongoCollection<Document> regions = db.getCollection("regions");
@@ -65,14 +85,26 @@ public class EnclaveModel {
         }
     }
 
+    /**
+     * Get the enclave's UUID
+     * @return UUID
+     */
     public UUID getUUID(){
         return enclaveUUID;
     }
 
+    /**
+     * Set the owner of the enclave (overwrite)
+     * @param uuid
+     */
     public void setOwner(UUID uuid) {
         collection.findOneAndUpdate(new Document("uuid", enclaveUUID.toString()), Updates.set("owner", uuid.toString()));
     }
 
+    /**
+     * Get the UUID of the player whom owns the enclave
+     * @return UUID
+     */
     public UUID getOwner() {
         Document enclaveDoc = collection.find(Filters.eq("uuid", enclaveUUID.toString())).first();
         if(enclaveDoc != null) {
@@ -82,19 +114,35 @@ public class EnclaveModel {
         }
     }
 
+    /**
+     * Set the name of the enclave (overwrite)
+     * @param name
+     */
     public void setName(String name) {
         collection.findOneAndUpdate(new Document("uuid", enclaveUUID.toString()), Updates.set("name", name));
     }
 
+    /**
+     * Get the name of the enclave
+     * @return String
+     */
     public String getName() {
         Document enclaveDoc = collection.find(Filters.eq("uuid", enclaveUUID.toString())).first();
         return Objects.requireNonNull(enclaveDoc).getString("name");
     }
 
+    /**
+     * Set the color of the enclave tag (overwrite)
+     * @param color
+     */
     public void setColor(String color) {
         collection.findOneAndUpdate(new Document("uuid", enclaveUUID.toString()), Updates.set("color", color));
     }
 
+    /**
+     * Get the hex color of the enclave
+     * @return String
+     */
     public String getColor() {
         Document enclaveDoc = collection.find(Filters.eq("uuid", enclaveUUID.toString())).first();
         return Objects.requireNonNull(enclaveDoc).getString("color");
