@@ -52,7 +52,6 @@ public class RegionModel {
         }
     }
 
-
     public void claimChunk(UUID enclave) {
         Document chunkDoc = new Document("x", chunk.getX())
                 .append("z", chunk.getZ())

@@ -33,6 +33,8 @@ public class EnclaveCommand implements CommandExecutor {
             } else if (args.length == 2) {
                 if (args[0].equalsIgnoreCase("create")) {
                     EnclaveManager.createEnclave(player, args[1]);
+                } else if (args[0].equalsIgnoreCase("invite")) {
+                    EnclaveManager.inviteMember(player, args[1]);
                 } else {
                     CommandHelp.sendHelp(player);
                 }

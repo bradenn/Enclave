@@ -13,6 +13,7 @@ public class CommandHelp {
                 formatLine("/e info", "Get info about a region") +
                 formatLine("/e claim", "Claim regions for your enclave") +
                 formatLine("/e unclaim", "Unclaim regions for your enclave");
+
         player.sendMessage(MessageUtils.format(stringBuilder));
     }
 

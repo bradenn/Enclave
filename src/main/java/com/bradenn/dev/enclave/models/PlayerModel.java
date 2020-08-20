@@ -43,6 +43,10 @@ public class PlayerModel {
         }
     }
 
+    public boolean hasEnclave(){
+        return getEnclave() != null;
+    }
+
     public String getUsername() {
         return getOnlinePlayer().getName();
     }

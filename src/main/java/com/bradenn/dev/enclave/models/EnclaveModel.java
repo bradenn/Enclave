@@ -6,9 +6,11 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import org.bson.BasicBSONObject;
+import org.bson.BsonArray;
+import org.bson.BsonDocument;
 import org.bson.Document;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import org.bson.conversions.Bson;
 
 import java.util.*;
 
@@ -35,9 +37,18 @@ public class EnclaveModel {
         Document enclaveDoc = new Document("uuid", enclaveUUID.toString())
                 .append("name", name)
                 .append("color", "#CCCCCC")
+                .append("tags", new BsonArray())
                 .append("owner", uuid.toString())
                 .append("members", members);
         collection.insertOne(enclaveDoc);
+    }
+
+    public boolean isOwner(UUID playerUUID){
+        Bson query = Filters.and(
+                Filters.eq("uuid", enclaveUUID.toString()),
+                Filters.eq("owner", playerUUID.toString()));
+        Document ownerDoc = collection.find(query).first();
+        return ownerDoc != null;
     }
 
     public void disbandEnclave(){
@@ -71,7 +82,6 @@ public class EnclaveModel {
         }
     }
 
-
     public void setName(String name) {
         collection.findOneAndUpdate(new Document("uuid", enclaveUUID.toString()), Updates.set("name", name));
     }
@@ -81,7 +91,6 @@ public class EnclaveModel {
         return Objects.requireNonNull(enclaveDoc).getString("name");
     }
 
-
     public void setColor(String color) {
         collection.findOneAndUpdate(new Document("uuid", enclaveUUID.toString()), Updates.set("color", color));
     }
@@ -89,6 +98,16 @@ public class EnclaveModel {
     public String getColor() {
         Document enclaveDoc = collection.find(Filters.eq("uuid", enclaveUUID.toString())).first();
         return Objects.requireNonNull(enclaveDoc).getString("color");
+    }
+
+    public void setTag(String tag, boolean  value){
+
+    }
+
+    public boolean getTag(String tag){
+        Document enclaveDoc = collection.find(Filters.eq("uuid", enclaveUUID.toString())).first();
+        BsonArray bd = ((BsonArray) enclaveDoc.get("tags"));
+        return false;
     }
 
 }

@@ -9,6 +9,10 @@ commands:
     description: Interact with enclaves
     aliases: e
     usage: /enclave args0 args1
+  enclaveadmin:
+    description: Interact with enclaves, but in an admin way
+    aliases: ea
+    usage: /enclaveadmin args0 args1
 permissions:
   enclave.*:
     default: false
