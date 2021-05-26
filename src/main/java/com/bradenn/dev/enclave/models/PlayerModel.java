@@ -47,7 +47,13 @@ public class PlayerModel {
      */
     public EnclaveModel getEnclave() {
         Document playerDoc = collection.find(Filters.eq("uuid", playerUUID.toString())).first();
-        return (playerDoc != null) ? new EnclaveModel(UUID.fromString(playerDoc.getString("enclave"))) : null;
+        assert playerDoc != null;
+        String uuid = playerDoc.getString("enclave");
+        if(uuid != null){
+            return new EnclaveModel(UUID.fromString(uuid));
+        }else{
+            return null;
+        }
     }
 
     /**

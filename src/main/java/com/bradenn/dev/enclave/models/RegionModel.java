@@ -46,7 +46,10 @@ public class RegionModel {
                     Filters.eq("z", chunk.getZ()),
                     Filters.eq("world", world.getName()));
             Document regionDoc = collection.find(query).first();
-            return new EnclaveModel(UUID.fromString(Objects.requireNonNull(regionDoc).getString("enclave")));
+
+            assert regionDoc != null;
+            return new EnclaveModel(UUID.fromString(regionDoc.getString("enclave")));
+
         } else {
             return null;
         }

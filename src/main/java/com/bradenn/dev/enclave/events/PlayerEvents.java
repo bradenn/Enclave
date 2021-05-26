@@ -22,7 +22,7 @@ public class PlayerEvents implements Listener {
         if (pm.getEnclave() != null) {
             e.setFormat(pm.getEnclave().getName() + " %s§6: §7%s");
         }else{
-            e.getPlayer().sendMessage("You have no enclave bb");
+            e.getPlayer().sendMessage("You have no enclave");
         }
     }
 

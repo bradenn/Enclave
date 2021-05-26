@@ -12,6 +12,7 @@ public class MessageUtils {
     // Text 8C8C8C
 
 
+
     public static String format(String s){
         return ChatColor.translateAlternateColorCodes('&', s);
     }
@@ -21,6 +22,14 @@ public class MessageUtils {
     }
 
     public static void sendMessage(Player player, String message){
+        player.sendMessage(getPrefix() + format(message));
+    }
+
+    public static void sendSuccess(Player player, String message){
+        player.sendMessage(getPrefix() + format(message));
+    }
+
+    public static void sendError(Player player, String message){
         player.sendMessage(getPrefix() + format(message));
     }
 

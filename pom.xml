@@ -29,6 +29,8 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <finalName>${project.artifactId}-${project.version}-SHADE</finalName>
+                            <outputDirectory>${dir}</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -55,7 +57,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.16.2-R0.1-SNAPSHOT</version>
+            <version>1.16.5-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

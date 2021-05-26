@@ -11,8 +11,8 @@ public class Database {
     public static MongoDatabase database;
 
     public static void connect() {
-        mongoClient = MongoClients.create("mongodb+srv://minecraft:fRenrJDxHO7RanSh@bn-mda-001-wjpga.mongodb.net/?retryWrites=true&w=majority");
-        database = mongoClient.getDatabase("minecraft");
+        mongoClient = MongoClients.create("mongodb://localhost:27017/?retryWrites=true&w=majority");
+        database = mongoClient.getDatabase("enclaves");
     }
 
     public static MongoDatabase getDatabase() {

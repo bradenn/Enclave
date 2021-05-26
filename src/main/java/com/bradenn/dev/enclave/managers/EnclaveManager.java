@@ -11,14 +11,16 @@ public class EnclaveManager {
 
     public static void createEnclave(Player player, String name) {
         PlayerModel playerModel = new PlayerModel(player.getUniqueId());
-        if (playerModel.hasEnclave()) {
+        EnclaveModel enclaveModel = playerModel.getEnclave();
+        if (!enclaveModel.isValid()) {
             if (validateName(name)) {
-                MessageUtils.sendMessage(player, "Created the enclave '" + new EnclaveModel(player.getUniqueId(), name).getName() + "'.");
+                enclaveModel = new EnclaveModel(player.getUniqueId(), name);
+                MessageUtils.sendMessage(player, "Created the enclave '" + enclaveModel.getName() + "'.");
             } else {
                 MessageUtils.sendMessage(player, "Your enclave name must not include any special characters.");
             }
         } else {
-            MessageUtils.sendMessage(player, "You must disband your current enclave before creating a new one.");
+            MessageUtils.sendMessage(player, "You must disband your current enclave, '" + enclaveModel.getName() + "' before creating a new one.");
         }
     }
 
@@ -87,7 +89,7 @@ public class EnclaveManager {
                 Player targetPlayer = parsePlayer(target);
                 PlayerModel targetPlayerModel = new PlayerModel(targetPlayer.getUniqueId());
                 if (targetPlayerModel.hasEnclave()) {
-                    
+
                 } else {
                     MessageUtils.sendMessage(player, "This player is already in an Enclave. They must leave first.");
                 }
@@ -114,7 +116,7 @@ public class EnclaveManager {
     /**
      * Parsing Utils
      */
-    private static Player parsePlayer(String name){
+    private static Player parsePlayer(String name) {
         return Bukkit.getPlayer(name);
     }
 

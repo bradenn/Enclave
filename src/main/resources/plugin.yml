@@ -1,8 +1,9 @@
 name: Enclave
 main: com.bradenn.dev.enclave.Main
-version: 1.0.1
+version: 1.1.1
 author: bradencn
-website: dev.bradenn.com
+api-version: 1.16
+website: bradenn.com
 description: Own land and have a good time (for opoq)
 commands:
   enclave:
