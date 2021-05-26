@@ -6,6 +6,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import net.md_5.bungee.api.ChatColor;
 import org.bson.BsonArray;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -115,6 +116,19 @@ public class EnclaveModel {
     }
 
     /**
+     * Get the UUID of the player whom owns the enclave
+     * @return UUID
+     */
+    public boolean hasMember(UUID uuid) {
+        Document enclaveDoc = collection.find(Filters.eq("uuid", enclaveUUID.toString())).first();
+        if(enclaveDoc != null) {
+           return Objects.requireNonNull(enclaveDoc).getString("members").contains(uuid.toString());
+        }else{
+            return false;
+        }
+    }
+
+    /**
      * Set the name of the enclave (overwrite)
      * @param name
      */
@@ -130,6 +144,15 @@ public class EnclaveModel {
         Document enclaveDoc = collection.find(Filters.eq("uuid", enclaveUUID.toString())).first();
         return Objects.requireNonNull(enclaveDoc).getString("name");
     }
+
+    /**
+     * Get the formatted name of the enclave
+     * @return String
+     */
+    public String getDisplayName() {
+        return ChatColor.of(getColor())+getName();
+    }
+
 
     /**
      * Set the color of the enclave tag (overwrite)

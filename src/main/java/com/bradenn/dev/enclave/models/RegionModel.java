@@ -29,6 +29,11 @@ public class RegionModel {
         this.world = world;
     }
 
+    public RegionModel(Chunk chunk) {
+        this.chunk = chunk;
+        this.world = chunk.getWorld();
+    }
+
     public boolean isClaimed() {
         Bson query = Filters.and(
                 Filters.eq("x", chunk.getX()),

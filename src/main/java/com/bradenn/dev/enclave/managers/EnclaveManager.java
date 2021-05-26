@@ -5,7 +5,13 @@ import com.bradenn.dev.enclave.models.EnclaveModel;
 import com.bradenn.dev.enclave.models.PlayerModel;
 import com.bradenn.dev.enclave.models.RegionModel;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
 
 public class EnclaveManager {
 
@@ -98,6 +104,26 @@ public class EnclaveManager {
             }
         } else {
             MessageUtils.sendMessage(player, "You must create or join an enclave before you can invite someone to join.");
+        }
+    }
+
+    public static void setColor(Player player, String target) {
+        PlayerModel playerModel = new PlayerModel(player.getUniqueId());
+        EnclaveModel enclaveModel = playerModel.getEnclave();
+        Pattern p = Pattern.compile("^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$");
+        List<String> colors = new ArrayList<>();
+        new ArrayList<>(Arrays.asList(ChatColor.values())).forEach(chatColor -> {
+            if(chatColor != ChatColor.MAGIC)
+            colors.add(chatColor.name());
+        });
+        if(p.matcher(target).matches()){
+            enclaveModel.setColor(target);
+            MessageUtils.sendMessage(player, String.format("Your enclave color has been changed to %s.", target));
+        }else if(colors.contains(target.toUpperCase())){
+            enclaveModel.setColor(target.toUpperCase());
+            MessageUtils.sendMessage(player, String.format("Your enclave color has been changed to %s.", target));
+        }else{
+            MessageUtils.sendError(player, "That is an invalid color.");
         }
     }
 

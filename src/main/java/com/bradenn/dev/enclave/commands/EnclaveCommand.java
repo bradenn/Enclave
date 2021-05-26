@@ -35,6 +35,8 @@ public class EnclaveCommand implements CommandExecutor {
                     EnclaveManager.createEnclave(player, args[1]);
                 } else if (args[0].equalsIgnoreCase("invite")) {
                     EnclaveManager.inviteMember(player, args[1]);
+                }else if (args[0].equalsIgnoreCase("color")) {
+                    EnclaveManager.setColor(player, args[1]);
                 } else {
                     CommandHelp.sendHelp(player);
                 }

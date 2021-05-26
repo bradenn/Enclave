@@ -2,6 +2,7 @@ package com.bradenn.dev.enclave;
 
 import com.bradenn.dev.enclave.commands.EnclaveCommand;
 import com.bradenn.dev.enclave.completers.EnclaveCompleter;
+import com.bradenn.dev.enclave.events.InteractionEvents;
 import com.bradenn.dev.enclave.events.PlayerEvents;
 import com.bradenn.dev.enclave.managers.PlayerManager;
 import com.bradenn.dev.enclave.managers.EnclaveManager;
@@ -19,6 +20,7 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("enclave")).setExecutor(new EnclaveCommand());
         Objects.requireNonNull(getCommand("enclave")).setTabCompleter(new EnclaveCompleter());
         getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
+        getServer().getPluginManager().registerEvents(new InteractionEvents(), this);
         Database.connect();
     }
 

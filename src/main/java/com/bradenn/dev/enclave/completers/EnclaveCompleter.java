@@ -18,6 +18,7 @@ public class EnclaveCompleter implements TabCompleter {
     public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] args) {
         children.put("claim", new ArrayList<>());
         children.put("unclaim", new ArrayList<>());
+        children.put("invite", null);
         children.put("info", new ArrayList<>());
         children.put("disband", new ArrayList<>());
         children.put("create", null);
