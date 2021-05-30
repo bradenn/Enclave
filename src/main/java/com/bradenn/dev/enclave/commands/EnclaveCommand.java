@@ -27,6 +27,8 @@ public class EnclaveCommand implements CommandExecutor {
                     EnclaveManager.claimRegion(player);
                 } else if (args[0].equalsIgnoreCase("info")) {
                     RegionManager.showRegionInfo(player);
+                } else if (args[0].equalsIgnoreCase("here")) {
+                    RegionManager.showRegionInfo(player);
                 } else {
                     CommandHelp.sendHelp(player);
                 }

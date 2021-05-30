@@ -7,9 +7,6 @@ import org.bukkit.entity.Player;
 
 public class InteractionUtility {
 
-    enum InteractionType {
-    }
-
     public static boolean invalidInteraction(Player player, Chunk chunk) {
         RegionModel rm = new RegionModel(chunk, chunk.getWorld());
         if (rm.isClaimed()) {
