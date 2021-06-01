@@ -3,14 +3,11 @@ package com.bradenn.dev.enclave.renderers;
 import com.bradenn.dev.enclave.models.RegionModel;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Chunk;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.map.*;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 
 public class EnclaveMap extends MapRenderer {
 
@@ -24,6 +21,9 @@ public class EnclaveMap extends MapRenderer {
 
     @Override
     public void render(@NotNull MapView mapView, @NotNull MapCanvas mapCanvas, @NotNull Player player) {
+        try {
+
+
         int absCenterX = mapView.getCenterX();
         int absCenterZ = mapView.getCenterZ();
         MapCursorCollection mcc = new MapCursorCollection();
@@ -63,8 +63,9 @@ public class EnclaveMap extends MapRenderer {
         mapView.setScale(MapView.Scale.CLOSEST);
         mapView.setCenterX(player.getLocation().getBlockX());
         mapView.setCenterZ(player.getLocation().getBlockZ());
-
-
+        }catch(java.lang.IllegalStateException ignored){
+            
+        }
     }
 
 

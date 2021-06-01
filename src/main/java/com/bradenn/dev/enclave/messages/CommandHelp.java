@@ -10,6 +10,7 @@ public class CommandHelp {
                 "Available Commands\n" +
                 formatLine("create [name]", "Create an enclave") +
                 formatLine("color [color]|[#hex]", "Change your enclave color") +
+                formatLine("map", "Get a map of nearby enclaves") +
                 formatLine("invite [player]", "Invite a player to your enclave") +
                 formatLine("claim", "Claim regions for your enclave") +
                 formatLine("unclaim", "Unclaim regions for your enclave") +
@@ -23,4 +24,13 @@ public class CommandHelp {
         return String.format("  &7/e %s%s %s- %s\n", ChatColor.of("#22AFFF"), cmd, "&7", desc);
     }
 
+    public static void sendNoobHelp(Player player) {
+        String stringBuilder = MessageUtils.getInfoPrefix() +
+                "Available Commands\n" +
+                formatLine("create [name]", "Create an enclave") +
+                formatLine("map", "Get a map of nearby enclaves") +
+                formatLine("here", "Get info about a region");
+
+        player.sendMessage(MessageUtils.format(stringBuilder));
+    }
 }

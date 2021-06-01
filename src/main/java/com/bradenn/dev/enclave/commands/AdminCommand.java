@@ -1,7 +1,5 @@
 package com.bradenn.dev.enclave.commands;
 
-import com.bradenn.dev.enclave.managers.EnclaveManager;
-import com.bradenn.dev.enclave.managers.RegionManager;
 import com.bradenn.dev.enclave.messages.CommandHelp;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -20,15 +18,15 @@ public class AdminCommand implements CommandExecutor {
                 case 1:
                     switch (args[0].toLowerCase()) {
                         case "disband":
-                            EnclaveManager.disbandEnclave(player);
+//                            EnclaveManager.disbandEnclave(player);
                         case "borders":
-                            RegionManager.showBorders(player);
+//                            RegionManager.showBorders(player);
                         case "unclaim":
-                            EnclaveManager.unclaimRegion(player);
+//                            EnclaveManager.unclaimRegion(player);
                         case "claim":
-                            EnclaveManager.claimRegion(player);
+//                            EnclaveManager.claimRegion(player);
                         case "info":
-                            RegionManager.showRegionInfo(player);
+//                            RegionManager.showRegionInfo(player);
                         default:
                             CommandHelp.sendHelp(player);
                     }

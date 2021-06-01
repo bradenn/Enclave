@@ -9,80 +9,82 @@ import com.mongodb.client.model.Updates;
 import net.md_5.bungee.api.ChatColor;
 import org.bson.BsonArray;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 public class EnclaveModel {
 
-    private final UUID enclaveUUID;
+    private final UUID uuid;
+    private final Document enclave;
 
     MongoDatabase db = Database.getDatabase();
     MongoCollection<Document> collection = db.getCollection("enclaves");
 
     /**
      * Find Enclave model
-     * @param uuid
      */
     public EnclaveModel(UUID uuid) {
-        enclaveUUID = uuid;
+        this.uuid = uuid;
+        enclave = getDocument();
+    }
+
+    private Document getDocument() {
+        return collection.find(new Document("uuid", uuid.toString())).first();
     }
 
     /**
      * Create model model
-     * @param uuid
-     * @param name
      */
-    public EnclaveModel(UUID uuid, String name) {
+    public EnclaveModel(UUID playerUUID, String name) {
         List<String> members;
         members = new ArrayList<>();
-        members.add(uuid.toString());
-        enclaveUUID = UUID.randomUUID();
-        new PlayerModel(uuid).setEnclave(enclaveUUID);
-        Document enclaveDoc = new Document("uuid", enclaveUUID.toString())
+        members.add(playerUUID.toString());
+        this.uuid = UUID.randomUUID();
+        new PlayerModel(playerUUID).setEnclave(this.uuid);
+        Document enclaveDoc = new Document("uuid", this.uuid.toString())
                 .append("name", name)
                 .append("color", "#CCCCCC")
                 .append("tags", new BsonArray())
-                .append("owner", uuid.toString())
+                .append("owner", playerUUID.toString())
                 .append("members", members);
         collection.insertOne(enclaveDoc);
+        enclave = getDocument();
     }
 
     /**
      * Check if the instance exists in the database
+     *
      * @return boolean
      */
-    public boolean isValid(){
-        return collection.find(new Document("uuid", enclaveUUID.toString())).first() != null;
+    public boolean isValid() {
+        return collection.find(new Document("uuid", uuid.toString())).first() != null;
     }
 
     /**
      * Check if the provided UUID belongs to the Enclave owner
-     * @param playerUUID
      * @return boolean
      */
-    public boolean isOwner(UUID playerUUID){
-        Bson query = Filters.and(
-                Filters.eq("uuid", enclaveUUID.toString()),
-                Filters.eq("owner", playerUUID.toString()));
-        Document ownerDoc = collection.find(query).first();
-        return ownerDoc != null;
+    public boolean isOwner(UUID playerUUID) {
+        return enclave.getString("owner").equalsIgnoreCase(playerUUID.toString());
     }
 
     /**
      * Upon disbanding the enclave, remove all claims from regions, remove all reference from players in guild
      */
-    public void disbandEnclave(){
-        collection.findOneAndDelete(new Document("uuid", enclaveUUID.toString()));
+    public void disbandEnclave() {
+        collection.findOneAndDelete(new Document("uuid", uuid.toString()));
         MongoCollection<Document> regions = db.getCollection("regions");
-        FindIterable<Document> regionDocs = regions.find(Filters.eq("enclave", enclaveUUID.toString()));
-        for(Document d : regionDocs){
-            regions.findOneAndUpdate(d, Updates.set("enclave", null));
+        FindIterable<Document> regionDocs = regions.find(Filters.eq("enclave", uuid.toString()));
+        for (Document d : regionDocs) {
+            regions.findOneAndDelete(d);
         }
         MongoCollection<Document> players = db.getCollection("players");
-        FindIterable<Document> playerDocs = players.find(Filters.eq("enclave", enclaveUUID.toString()));
-        for(Document p : playerDocs){
-            regions.findOneAndUpdate(p, Updates.set("enclave", null));
+        FindIterable<Document> playerDocs = players.find(Filters.eq("enclave", uuid.toString()));
+        for (Document p : playerDocs) {
+            players.findOneAndUpdate(p, Updates.set("enclave", null));
         }
     }
 
@@ -90,95 +92,94 @@ public class EnclaveModel {
      * Get the enclave's UUID
      * @return UUID
      */
-    public UUID getUUID(){
-        return enclaveUUID;
+    public UUID getUUID() {
+        return uuid;
     }
 
     /**
      * Set the owner of the enclave (overwrite)
-     * @param uuid
      */
     public void setOwner(UUID uuid) {
-        collection.findOneAndUpdate(new Document("uuid", enclaveUUID.toString()), Updates.set("owner", uuid.toString()));
+        collection.findOneAndUpdate(new Document("uuid", uuid.toString()), Updates.set("owner", uuid.toString()));
     }
 
     /**
      * Get the UUID of the player whom owns the enclave
+     *
      * @return UUID
      */
     public UUID getOwner() {
-        Document enclaveDoc = collection.find(Filters.eq("uuid", enclaveUUID.toString())).first();
-        if(enclaveDoc != null) {
-            return UUID.fromString(Objects.requireNonNull(enclaveDoc).getString("owner"));
-        }else{
-            return null;
-        }
+        return UUID.fromString(enclave.getString("owner"));
     }
 
     /**
      * Get the UUID of the player whom owns the enclave
+     *
      * @return UUID
      */
     public boolean hasMember(UUID uuid) {
-        Document enclaveDoc = collection.find(Filters.eq("uuid", enclaveUUID.toString())).first();
-        if(enclaveDoc != null) {
-           return Objects.requireNonNull(enclaveDoc).getString("members").contains(uuid.toString());
-        }else{
-            return false;
-        }
+        return enclave.getList("members", String.class).contains(uuid.toString());
     }
 
     /**
      * Set the name of the enclave (overwrite)
-     * @param name
      */
     public void setName(String name) {
-        collection.findOneAndUpdate(new Document("uuid", enclaveUUID.toString()), Updates.set("name", name));
+        collection.findOneAndUpdate(new Document("uuid", uuid.toString()), Updates.set("name", name));
     }
 
     /**
      * Get the name of the enclave
+     *
      * @return String
      */
     public String getName() {
-        Document enclaveDoc = collection.find(Filters.eq("uuid", enclaveUUID.toString())).first();
-        return Objects.requireNonNull(enclaveDoc).getString("name");
+        return enclave.getString("name");
     }
 
     /**
      * Get the formatted name of the enclave
+     *
      * @return String
      */
     public String getDisplayName() {
-        return ChatColor.of(getColor())+getName();
+        return ChatColor.of(getColor()) + getName();
     }
 
 
     /**
      * Set the color of the enclave tag (overwrite)
-     * @param color
      */
     public void setColor(String color) {
-        collection.findOneAndUpdate(new Document("uuid", enclaveUUID.toString()), Updates.set("color", color));
+        collection.findOneAndUpdate(new Document("uuid", uuid.toString()), Updates.set("color", color));
     }
 
     /**
      * Get the hex color of the enclave
+     *
      * @return String
      */
     public String getColor() {
-        Document enclaveDoc = collection.find(Filters.eq("uuid", enclaveUUID.toString())).first();
+        Document enclaveDoc = collection.find(Filters.eq("uuid", uuid.toString())).first();
         return Objects.requireNonNull(enclaveDoc).getString("color");
     }
 
-    public void setTag(String tag, boolean  value){
-
+    public boolean toggleTag(EnclaveTag tag) {
+        if(!enclave.getList("tags", String.class).contains(tag.toString())){
+            collection.findOneAndUpdate(new Document("uuid", uuid.toString()), Updates.addToSet("tags", tag.toString()));
+            return true;
+        }else{
+            collection.findOneAndUpdate(new Document("uuid", uuid.toString()), Updates.pull("tags", tag.toString()));
+            return false;
+        }
     }
 
-    public boolean getTag(String tag){
-        Document enclaveDoc = collection.find(Filters.eq("uuid", enclaveUUID.toString())).first();
-        BsonArray bd = ((BsonArray) enclaveDoc.get("tags"));
-        return false;
+    public List<String> getTags() {
+        return enclave.getList("tags", String.class);
+    }
+
+    public boolean checkTag(EnclaveTag tag) {
+        return enclave.getList("tags", String.class).contains(tag.toString());
     }
 
 }

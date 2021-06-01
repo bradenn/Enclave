@@ -1,7 +1,7 @@
 package com.bradenn.dev.enclave.events;
 
-import com.bradenn.dev.enclave.managers.PlayerManager;
 import com.bradenn.dev.enclave.messages.MessageUtils;
+import com.bradenn.dev.enclave.models.EnclaveTag;
 import com.bradenn.dev.enclave.models.RegionModel;
 import com.bradenn.dev.enclave.utilities.InteractionUtility;
 import org.bukkit.Chunk;
@@ -11,8 +11,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-
-import java.util.Objects;
 
 public class InteractionEvents implements Listener {
 
@@ -32,7 +30,8 @@ public class InteractionEvents implements Listener {
 
     @EventHandler
     public void playerInteractEvent(PlayerInteractEvent e) {
-        if (InteractionUtility.invalidInteraction(e.getPlayer(), Objects.requireNonNull(e.getClickedBlock()).getChunk())) {
+        if(e.getClickedBlock() == null) return;
+        if (InteractionUtility.invalidInteraction(e.getPlayer(), e.getClickedBlock().getChunk())) {
             e.setCancelled(true);
         }
     }
@@ -50,8 +49,12 @@ public class InteractionEvents implements Listener {
             RegionModel to = new RegionModel(chunkTo);
 
             if (to.isClaimed()) {
+                if(InteractionUtility.invalidEvent(e.getTo().getChunk(), EnclaveTag.ENTER)){
+                    e.setCancelled(true);
+                }
                 if(from.isClaimed()){
                     if(!to.getEnclave().getUUID().toString().equals(from.getEnclave().getUUID().toString())){
+
                         MessageUtils.sendAction(e.getPlayer(), String.format("&aNow entering %s&a.", to.getEnclave().getDisplayName()));
                     }
                 }else{

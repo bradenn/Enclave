@@ -1,15 +1,15 @@
 name: Enclave
 main: com.bradenn.dev.enclave.Main
-version: 1.1.1
+version: 1.2.1
 author: bradencn
 api-version: 1.16
 website: bradenn.com
-description: Own land and have a good time (for opoq)
+description: Own land and have a good time. (for opoq)
 commands:
   enclave:
     description: Interact with enclaves
     aliases: e
-    usage: /enclave args0 args1
+    usage: /enclave [command] <?attribute>
   enclaveadmin:
     description: Interact with enclaves, but in an admin way
     aliases: ea
@@ -17,3 +17,5 @@ commands:
 permissions:
   enclave.*:
     default: false
+  enclave.override:
+    default: op
