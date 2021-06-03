@@ -1,5 +1,6 @@
 package com.bradenn.dev.enclave.persistent;
 
+import com.bradenn.dev.enclave.Main;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -12,8 +13,13 @@ public class Database {
     public static MongoDatabase database;
 
     public static void connect() {
-        mongoClient = MongoClients.create("mongodb://localhost:27017/?retryWrites=true&w=majority");
-        database = mongoClient.getDatabase("enclaves");
+            String uri = Main.plugin.getConfig().getString("mongo.uri");
+            assert uri != null;
+            System.out.println(uri);
+
+            mongoClient = MongoClients.create(uri);
+            database = mongoClient.getDatabase("enclaves");
+
     }
 
     public static MongoDatabase getDatabase() {

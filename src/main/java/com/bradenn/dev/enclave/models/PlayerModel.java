@@ -11,6 +11,8 @@ import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class PlayerModel {
@@ -26,7 +28,11 @@ public class PlayerModel {
     public PlayerModel(UUID uuid) {
         Document playerDoc = collection.find(Filters.eq("uuid", uuid.toString())).first();
         if (playerDoc == null) {
-            Document newPlayerDoc = new Document("uuid", uuid.toString()).append("enclave", null).append("username", Bukkit.getPlayer(uuid).getName());
+            List<String> invites = new ArrayList<>();
+            Document newPlayerDoc = new Document("uuid", uuid.toString())
+                    .append("enclave", null)
+                    .append("invites", invites)
+                    .append("username", Bukkit.getPlayer(uuid).getName());
             collection.insertOne(newPlayerDoc);
         } else {
             playerUUID = uuid;
@@ -62,6 +68,10 @@ public class PlayerModel {
      */
     public boolean hasEnclave() {
         return getEnclave() != null;
+    }
+
+    public void addInvite(UUID enclaveUUID) {
+        collection.findOneAndUpdate(new Document("uuid", playerUUID), Updates.addToSet("invites", enclaveUUID.toString()));
     }
 
     /**

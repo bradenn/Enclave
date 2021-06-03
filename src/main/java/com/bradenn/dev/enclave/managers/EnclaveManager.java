@@ -34,9 +34,9 @@ public class EnclaveManager {
     }
 
     public boolean isValid() {
-        if(enclave != null){
+        if (enclave != null) {
             return enclave.isValid();
-        }else{
+        } else {
             return false;
         }
     }
@@ -113,7 +113,8 @@ public class EnclaveManager {
                 if (targetPlayerModel.hasEnclave()) {
                     MessageUtils.sendMessage(player, "This player is already in an Enclave. They must leave first.");
                 } else {
-
+                    targetPlayerModel.addInvite(enclave.getUUID());
+                    MessageUtils.sendMessage(targetPlayer, "You have been invited to join '" + enclave.getName() + "'. Type /e accept " + enclave.getName() + " to accept and join.");
                 }
             } else {
                 MessageUtils.sendMessage(player, "That player does not exist.");
@@ -143,30 +144,8 @@ public class EnclaveManager {
         }
     }
 
-    /**
-     * Verification Utils
-     */
-    private static boolean validateName(String name) {
-        String pattern = "^[a-zA-Z0-9]*$";
-        return name.matches(pattern);
-    }
-
-    private static boolean validatePlayer(String name) {
-        return parsePlayer(name) != null;
-    }
-
-    /**
-     * Parsing Utils
-     */
-    private static Player parsePlayer(String name) {
-        return Bukkit.getPlayer(name);
-    }
-
-
     public void toggleTag(String arg) {
-        PlayerModel playerModel = new PlayerModel(player.getUniqueId());
-        EnclaveModel enclaveModel = playerModel.getEnclave();
-        if (enclaveModel.toggleTag(EnclaveTag.valueOf(arg))) {
+        if (enclave.toggleTag(EnclaveTag.valueOf(arg))) {
             MessageUtils.sendMessage(player, "The attribute '" + arg + "' is now disabled.");
         } else {
             MessageUtils.sendMessage(player, "The attribute '" + arg + "' is now enabled.");
@@ -174,14 +153,31 @@ public class EnclaveManager {
     }
 
     public void getTags() {
-        PlayerModel playerModel = new PlayerModel(player.getUniqueId());
-        EnclaveModel enclaveModel = playerModel.getEnclave();
         List<String> diff = new ArrayList<>();
         for (EnclaveTag value : EnclaveTag.values()) {
-            if (!enclaveModel.getTags().contains(value.name())) diff.add(value.name());
+            if (!enclave.getTags().contains(value.name())) diff.add(value.name());
         }
         MessageUtils.sendMessage(player, "Enabled: " + diff);
-        MessageUtils.sendMessage(player, "Disabled: " + enclaveModel.getTags().toString());
-
+        MessageUtils.sendMessage(player, "Disabled: " + enclave.getTags().toString());
     }
+
+    /**
+     * Verification Utils
+     */
+    private boolean validateName(String name) {
+        String pattern = "^[a-zA-Z0-9]*$";
+        return name.matches(pattern);
+    }
+
+    private boolean validatePlayer(String name) {
+        return parsePlayer(name) != null;
+    }
+
+    /**
+     * Parsing Utils
+     */
+    private Player parsePlayer(String name) {
+        return Bukkit.getPlayer(name);
+    }
+
 }
