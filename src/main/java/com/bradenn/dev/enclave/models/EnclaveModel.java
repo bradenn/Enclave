@@ -3,25 +3,21 @@ package com.bradenn.dev.enclave.models;
 import com.bradenn.dev.enclave.persistent.Database;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import net.md_5.bungee.api.ChatColor;
 import org.bson.BsonArray;
 import org.bson.Document;
+import org.bukkit.Location;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class EnclaveModel {
 
     private final UUID uuid;
     private final Document enclave;
 
-    MongoDatabase db = Database.getDatabase();
-    MongoCollection<Document> collection = db.getCollection("enclaves");
+    MongoCollection<Document> collection = Database.getCollection("enclaves");
 
     /**
      * Find Enclave model
@@ -75,17 +71,20 @@ public class EnclaveModel {
      * Upon disbanding the enclave, remove all claims from regions, remove all reference from players in guild
      */
     public void disbandEnclave() {
-        collection.findOneAndDelete(new Document("uuid", uuid.toString()));
-        MongoCollection<Document> regions = db.getCollection("regions");
+
+        MongoCollection<Document> regions = Database.getCollection("regions");
         FindIterable<Document> regionDocs = regions.find(Filters.eq("enclave", uuid.toString()));
         for (Document d : regionDocs) {
             regions.findOneAndDelete(d);
         }
-        MongoCollection<Document> players = db.getCollection("players");
+
+        MongoCollection<Document> players = Database.getCollection("players");
         FindIterable<Document> playerDocs = players.find(Filters.eq("enclave", uuid.toString()));
         for (Document p : playerDocs) {
             players.findOneAndUpdate(p, Updates.set("enclave", null));
         }
+
+        collection.findOneAndDelete(new Document("uuid", uuid.toString()));
     }
 
     /**
@@ -162,6 +161,22 @@ public class EnclaveModel {
     public String getColor() {
         Document enclaveDoc = collection.find(Filters.eq("uuid", uuid.toString())).first();
         return Objects.requireNonNull(enclaveDoc).getString("color");
+    }
+
+    /**
+     * Set the home of the enclave
+     */
+    public void setHome(Location location) {
+        collection.findOneAndUpdate(new Document("uuid", uuid.toString()), Updates.set("home", location.serialize()));
+    }
+
+    /**
+     * Set the home of the enclave
+     */
+    public Location getHome() {
+        Map<String, Object> location = (Map<String, Object>) enclave.get("home");
+        if(location == null) return null;
+        return Location.deserialize(location);
     }
 
     public boolean toggleTag(EnclaveTag tag) {

@@ -6,6 +6,9 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.bukkit.configuration.Configuration;
+
+import java.util.Objects;
 
 public class Database {
 
@@ -13,13 +16,13 @@ public class Database {
     public static MongoDatabase database;
 
     public static void connect() {
-            String uri = Main.plugin.getConfig().getString("mongo.uri");
-            assert uri != null;
-            System.out.println(uri);
+        Configuration config = Main.plugin.getConfig();
 
-            mongoClient = MongoClients.create(uri);
-            database = mongoClient.getDatabase("enclaves");
+        String uri = Objects.requireNonNull(config.getString("mongo.uri"));
+        mongoClient = MongoClients.create(uri);
 
+        String databaseName = Objects.requireNonNull(config.getString("mongo.database"));
+        database = mongoClient.getDatabase(databaseName);
     }
 
     public static MongoDatabase getDatabase() {

@@ -5,8 +5,10 @@ import com.bradenn.dev.enclave.models.EnclaveModel;
 import com.bradenn.dev.enclave.models.EnclaveTag;
 import com.bradenn.dev.enclave.models.PlayerModel;
 import com.bradenn.dev.enclave.models.RegionModel;
+import com.bradenn.dev.enclave.renderers.ParticleRenderer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -161,6 +163,34 @@ public class EnclaveManager {
         MessageUtils.sendMessage(player, "Disabled: " + enclave.getTags().toString());
     }
 
+    public void setHome() {
+        if (enclave.isOwner(playerModel.getPlayerUUID())) {
+            if (region.isEnclave(enclave.getUUID())) {
+                MessageUtils.sendMessage(player, "Your enclave home as been set to your current position.");
+                enclave.setHome(player.getLocation());
+            } else {
+                MessageUtils.sendMessage(player, "An enclave home can only be set within your Enclave. Silly goose!");
+            }
+        } else {
+            MessageUtils.sendMessage(player, "You must be the owner of the enclave to set a home.");
+        }
+    }
+
+    public void goHome() {
+        if (enclave.hasMember(playerModel.getPlayerUUID())) {
+            Location loc = enclave.getHome();
+            if (loc == null) {
+                MessageUtils.sendMessage(player, "Your enclave does not have a home set.");
+            } else {
+                player.teleport(loc);
+                MessageUtils.sendMessage(player, "You have teleported to your enclave's home.");
+                ParticleRenderer.beamUp(player.getLocation().add(0, 0, 0), net.md_5.bungee.api.ChatColor.of(enclave.getColor()).getColor());
+            }
+        } else {
+            MessageUtils.sendMessage(player, "Interesting, inform your local developer of this message. You may be entitled to zero compensation. Error Code #69420");
+        }
+    }
+
     /**
      * Verification Utils
      */
@@ -179,5 +209,6 @@ public class EnclaveManager {
     private Player parsePlayer(String name) {
         return Bukkit.getPlayer(name);
     }
+
 
 }

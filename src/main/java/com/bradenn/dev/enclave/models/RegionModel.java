@@ -46,6 +46,13 @@ public class RegionModel {
         }
     }
 
+    public boolean isEnclave(UUID enclaveUUID) {
+        if (isClaimed()) {
+            return getEnclave().getUUID().equals(enclaveUUID);
+        }
+        return false;
+    }
+
     public EnclaveModel getEnclave() {
         if (isClaimed()) {
             return new EnclaveModel(UUID.fromString(document.getString("enclave")));

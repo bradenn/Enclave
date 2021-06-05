@@ -55,6 +55,12 @@ public class EnclaveCommand implements CommandExecutor {
                             case "disband":
                                 enclaveManager.disbandEnclave();
                                 break;
+                            case "sethome":
+                                enclaveManager.setHome();
+                                break;
+                            case "home":
+                                enclaveManager.goHome();
+                                break;
                             case "map":
                                 RegionManager.showBorders(player);
                                 break;
