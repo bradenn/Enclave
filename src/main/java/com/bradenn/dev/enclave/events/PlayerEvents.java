@@ -10,13 +10,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 
 public class PlayerEvents implements Listener {
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent e) {
-        PlayerModel pm = new PlayerModel(e.getPlayer().getUniqueId());
+    public void onJoin(AsyncPlayerPreLoginEvent e) {
+        PlayerModel pm = new PlayerModel(e.getUniqueId());
     }
 
     @EventHandler

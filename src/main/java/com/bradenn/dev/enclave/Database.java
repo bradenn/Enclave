@@ -1,6 +1,5 @@
-package com.bradenn.dev.enclave.persistent;
+package com.bradenn.dev.enclave;
 
-import com.bradenn.dev.enclave.Main;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;

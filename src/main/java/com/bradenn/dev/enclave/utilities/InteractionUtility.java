@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 public class InteractionUtility {
 
     public static boolean invalidEvent(Chunk chunk, EnclaveTag tag) {
-        RegionModel rm = new RegionModel(chunk, chunk.getWorld());
+        RegionModel rm = new RegionModel(chunk);
         if (rm.isClaimed()) {
             return rm.getEnclave().checkTag(tag);
         } else {
@@ -18,7 +18,7 @@ public class InteractionUtility {
     }
 
     public static boolean invalidInteraction(Player player, Chunk chunk) {
-        RegionModel rm = new RegionModel(chunk, chunk.getWorld());
+        RegionModel rm = new RegionModel(chunk);
         if (rm.isClaimed()) {
             if (rm.getEnclave().hasMember(player.getUniqueId())) {
                 return false;

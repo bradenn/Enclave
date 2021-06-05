@@ -3,15 +3,22 @@ package com.bradenn.dev.enclave.commands;
 import com.bradenn.dev.enclave.managers.EnclaveManager;
 import com.bradenn.dev.enclave.managers.RegionManager;
 import com.bradenn.dev.enclave.messages.CommandHelp;
+import com.bradenn.dev.enclave.models.EnclaveTag;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class EnclaveCommand implements CommandExecutor {
+import java.util.*;
 
-    public boolean onCommand(@NotNull CommandSender commandSender, Command command, String s, String[] args) {
+public class EnclaveCommand implements CommandExecutor, TabCompleter {
+
+    @Override
+    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command,
+                             @NotNull String s, String[] args) {
         if (!(commandSender instanceof Player)) {
             commandSender.sendMessage("Enclave commands are only available for players.");
             return true;
@@ -108,4 +115,40 @@ public class EnclaveCommand implements CommandExecutor {
         }
         return true;
     }
+
+    @NotNull
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command,
+                                      @NotNull String s, String[] args) {
+        Map<String, List<String>> commands = new HashMap<>();
+
+        commands.put("claim", new ArrayList<>());
+        commands.put("unclaim", new ArrayList<>());
+        commands.put("invite", null);
+        commands.put("map", new ArrayList<>());
+        commands.put("here", new ArrayList<>());
+        commands.put("disband", new ArrayList<>());
+        commands.put("create", null);
+        commands.put("tags", null);
+
+        commands.put("color", enumList(ChatColor.values()));
+        commands.put("tag", enumList(EnclaveTag.values()));
+
+        switch (args.length) {
+            case 1:
+                return new ArrayList<>(commands.keySet());
+            case 2:
+                return commands.get(args[0]);
+            default:
+                return new ArrayList<>();
+        }
+    }
+
+
+    public <T extends Enum<T>> List<String> enumList(T[] object) {
+        List<String> items = new ArrayList<>();
+        for (T t : object) items.add(t.name());
+        return items;
+    }
+
 }

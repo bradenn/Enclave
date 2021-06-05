@@ -1,6 +1,6 @@
 package com.bradenn.dev.enclave.models;
 
-import com.bradenn.dev.enclave.persistent.Database;
+import com.bradenn.dev.enclave.Database;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -132,7 +132,7 @@ public class EnclaveModel {
         FindIterable<Document> playerDocs = players.find(foreignKey);
         // Set each player's enclave to null, effectively removing them from the enclave.
         playerDocs.forEach((Consumer<? super Document>) (Document doc) ->
-                players.findOneAndUpdate(doc, Updates.set("uuid", null)));
+                players.findOneAndUpdate(doc, Updates.set("enclave", null)));
 
         // Remove the enclave document from the database.
         this.collection.findOneAndDelete(queryDocument());

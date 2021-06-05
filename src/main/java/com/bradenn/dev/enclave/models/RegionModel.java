@@ -1,6 +1,6 @@
 package com.bradenn.dev.enclave.models;
 
-import com.bradenn.dev.enclave.persistent.Database;
+import com.bradenn.dev.enclave.Database;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
