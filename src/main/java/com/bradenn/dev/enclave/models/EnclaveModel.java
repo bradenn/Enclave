@@ -8,59 +8,104 @@ import com.mongodb.client.model.Updates;
 import net.md_5.bungee.api.ChatColor;
 import org.bson.BsonArray;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bukkit.Location;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Consumer;
 
 public class EnclaveModel {
 
     private final UUID uuid;
     private final Document enclave;
 
-    MongoCollection<Document> collection = Database.getCollection("enclaves");
+    private final MongoCollection<Document> collection = Database.getCollection("enclaves");
 
     /**
-     * Find Enclave model
+     * Get an enclave's database document from it's UUID.
+     *
+     * @param uuid Enclave UUID
      */
     public EnclaveModel(UUID uuid) {
         this.uuid = uuid;
-        enclave = getDocument();
-    }
-
-    private Document getDocument() {
-        return collection.find(new Document("uuid", uuid.toString())).first();
+        this.enclave = getDocument();
     }
 
     /**
-     * Create model model
+     * Create and insert a new enclave into the database.
+     *
+     * @param playerUUID Owner UUID
+     * @param name       Enclave Name
      */
     public EnclaveModel(UUID playerUUID, String name) {
-        List<String> members;
-        members = new ArrayList<>();
+        // Generate a new UUID for the enclave.
+        UUID enclaveUUID = UUID.randomUUID();
+
+        // Initialize a list of members, including the owner.
+        List<String> members = new ArrayList<>();
         members.add(playerUUID.toString());
-        this.uuid = UUID.randomUUID();
-        new PlayerModel(playerUUID).setEnclave(this.uuid);
-        Document enclaveDoc = new Document("uuid", this.uuid.toString())
+        // Get the provided Player to own then Enclave, then update their record.
+        PlayerModel pm = new PlayerModel(playerUUID);
+        pm.setEnclave(enclaveUUID);
+
+        // Generate the BSON Document for MongoDB.
+        Document enclaveDoc = new Document()
+                .append("uuid", enclaveUUID.toString())
                 .append("name", name)
                 .append("color", "#CCCCCC")
                 .append("tags", new BsonArray())
                 .append("owner", playerUUID.toString())
                 .append("members", members);
+        // Insert the document into the database.
         collection.insertOne(enclaveDoc);
-        enclave = getDocument();
+
+        // Initialize the current class with the new UUID.
+        this.uuid = enclaveUUID;
+        this.enclave = getDocument();
     }
 
     /**
-     * Check if the instance exists in the database
+     * Get the query document for the current enclave.
+     * @return Document Update document
+     */
+    private Document queryDocument() {
+        // The query is represented with a key-value pair uuid:<UUID>
+        return new Document("uuid", uuid.toString());
+    }
+
+    /**
+     * Execute bson on the current enclave.
+     * @param bson Update document
+     */
+    private void updateEnclave(Bson bson){
+        this.collection.findOneAndUpdate(queryDocument(), bson);
+    }
+
+    /**
+     * Get the enclave's document from MongoDB.
      *
-     * @return boolean
+     * @return Document Enclave Document
+     */
+    private Document getDocument() {
+        // Return the first document with a matching UUID.
+        return this.collection.find(queryDocument()).first();
+    }
+
+    /**
+     * Check if the enclave instance exists in the database.
+     *
+     * @return boolean UUID is Valid
      */
     public boolean isValid() {
-        return collection.find(new Document("uuid", uuid.toString())).first() != null;
+        return getDocument() != null;
     }
 
     /**
-     * Check if the provided UUID belongs to the Enclave owner
+     * Determine if a player's UUID is associated with the ownership of the enclave.
+     *
      * @return boolean
      */
     public boolean isOwner(UUID playerUUID) {
@@ -68,23 +113,29 @@ public class EnclaveModel {
     }
 
     /**
-     * Upon disbanding the enclave, remove all claims from regions, remove all reference from players in guild
+     * Cascade delete an enclave and it's entire influence.
      */
     public void disbandEnclave() {
+        // Define the document to find regions and players belonging to the enclave.
+        Bson foreignKey = Filters.eq("enclave", uuid.toString());
 
+        // Get the region collection from the database.
         MongoCollection<Document> regions = Database.getCollection("regions");
-        FindIterable<Document> regionDocs = regions.find(Filters.eq("enclave", uuid.toString()));
-        for (Document d : regionDocs) {
-            regions.findOneAndDelete(d);
-        }
+        // Find all regions claimed or otherwise affiliated with this enclave.
+        FindIterable<Document> regionDocs = regions.find(foreignKey);
+        // Remove each of the affiliated regions from the database.
+        regionDocs.forEach((Consumer<? super Document>) regions::findOneAndDelete);
 
+        // Get the player collection from the database.
         MongoCollection<Document> players = Database.getCollection("players");
-        FindIterable<Document> playerDocs = players.find(Filters.eq("enclave", uuid.toString()));
-        for (Document p : playerDocs) {
-            players.findOneAndUpdate(p, Updates.set("enclave", null));
-        }
+        // Find all players belonging to the enclave.
+        FindIterable<Document> playerDocs = players.find(foreignKey);
+        // Set each player's enclave to null, effectively removing them from the enclave.
+        playerDocs.forEach((Consumer<? super Document>) (Document doc) ->
+                players.findOneAndUpdate(doc, Updates.set("uuid", null)));
 
-        collection.findOneAndDelete(new Document("uuid", uuid.toString()));
+        // Remove the enclave document from the database.
+        this.collection.findOneAndDelete(queryDocument());
     }
 
     /**
@@ -96,15 +147,15 @@ public class EnclaveModel {
     }
 
     /**
-     * Set the owner of the enclave (overwrite)
+     * Set the owner of the enclave.
+     * @param playerUUID Player UUID
      */
-    public void setOwner(UUID uuid) {
-        collection.findOneAndUpdate(new Document("uuid", uuid.toString()), Updates.set("owner", uuid.toString()));
+    public void setOwner(UUID playerUUID) {
+        updateEnclave(Updates.set("owner", playerUUID.toString()));
     }
 
     /**
      * Get the UUID of the player whom owns the enclave
-     *
      * @return UUID
      */
     public UUID getOwner() {
@@ -112,8 +163,7 @@ public class EnclaveModel {
     }
 
     /**
-     * Get the UUID of the player whom owns the enclave
-     *
+     * Determine whether the enclave has a member with a UUID.
      * @return UUID
      */
     public boolean hasMember(UUID uuid) {
@@ -124,7 +174,7 @@ public class EnclaveModel {
      * Set the name of the enclave (overwrite)
      */
     public void setName(String name) {
-        collection.findOneAndUpdate(new Document("uuid", uuid.toString()), Updates.set("name", name));
+        updateEnclave(Updates.set("name", name));
     }
 
     /**
@@ -150,7 +200,7 @@ public class EnclaveModel {
      * Set the color of the enclave tag (overwrite)
      */
     public void setColor(String color) {
-        collection.findOneAndUpdate(new Document("uuid", uuid.toString()), Updates.set("color", color));
+        updateEnclave(Updates.set("color", color));
     }
 
     /**
@@ -159,42 +209,68 @@ public class EnclaveModel {
      * @return String
      */
     public String getColor() {
-        Document enclaveDoc = collection.find(Filters.eq("uuid", uuid.toString())).first();
-        return Objects.requireNonNull(enclaveDoc).getString("color");
+        return enclave.getString("color");
     }
 
     /**
      * Set the home of the enclave
      */
     public void setHome(Location location) {
-        collection.findOneAndUpdate(new Document("uuid", uuid.toString()), Updates.set("home", location.serialize()));
+        updateEnclave(Updates.set("home", location.serialize()));
+    }
+
+
+    /**
+     * Get the home location of the enclave.
+     * @return Location Enclave Home, returns null if no home is set.
+     */
+    @SuppressWarnings("unchecked")
+    public Location getHome() {
+        // Get the home location from the enclave document.
+        Map<String, Object> location = (Map<String, Object>) enclave.get("home");
+        // Return the deserialized location, or null if there is no home set.
+        return (location != null)?Location.deserialize(location):null;
     }
 
     /**
-     * Set the home of the enclave
+     * Get all tag attributes currently disabled in this enclave.
+     * @return List<String> List of disabled properties
      */
-    public Location getHome() {
-        Map<String, Object> location = (Map<String, Object>) enclave.get("home");
-        if(location == null) return null;
-        return Location.deserialize(location);
-    }
-
-    public boolean toggleTag(EnclaveTag tag) {
-        if(!enclave.getList("tags", String.class).contains(tag.toString())){
-            collection.findOneAndUpdate(new Document("uuid", uuid.toString()), Updates.addToSet("tags", tag.toString()));
-            return true;
-        }else{
-            collection.findOneAndUpdate(new Document("uuid", uuid.toString()), Updates.pull("tags", tag.toString()));
-            return false;
-        }
-    }
-
     public List<String> getTags() {
         return enclave.getList("tags", String.class);
     }
 
+    /**
+     * Check if a tag attribute has been disabled in this enclave.
+     * @return boolean If true, the tag attribute is disabled.
+     */
     public boolean checkTag(EnclaveTag tag) {
-        return enclave.getList("tags", String.class).contains(tag.toString());
+        String serializedTag = tag.toString();
+        return getTags().contains(serializedTag);
     }
 
+    /**
+     * Toggle the given tag on or off depending on it's previous state.
+     * All tags in the list are considered "disabled", all are "enabled" by default.
+     * @param tag The EnclaveTag to toggle
+     * @return boolean
+     */
+    public boolean toggleTag(EnclaveTag tag) {
+        // Get the current tag list from the enclave document.
+        List<String> tagList = getTags();
+        String serializedTag = tag.toString();
+
+        // Toggle the tag based on it's current state.
+        if (tagList.contains(serializedTag)) {
+            // Remove the reference of the provided tag from the enclave document's tag array.
+            updateEnclave(Updates.pull("tags", serializedTag));
+            // Return false to signify that the tag has been enabled.
+            return false;
+        } else {
+            // Add the provided tag to the enclave document's tag array.
+            updateEnclave(Updates.addToSet("tags", serializedTag));
+            // Return true to signify that the tag has been disabled.
+            return true;
+        }
+    }
 }

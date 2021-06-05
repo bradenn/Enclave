@@ -1,15 +1,10 @@
 package com.bradenn.dev.enclave.models;
 
 import com.bradenn.dev.enclave.persistent.Database;
-
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
-
 import org.bson.Document;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,44 +12,66 @@ import java.util.UUID;
 
 public class PlayerModel {
 
-    private UUID playerUUID;
-    MongoDatabase db = Database.getDatabase();
-    MongoCollection<Document> collection = db.getCollection("players");
+    private final UUID playerUUID;
+    private final MongoCollection<Document> collection = Database.getCollection("players");
+    private final Document player;
 
     /**
-     * Access the player model
-     * @param uuid
+     * Initialize the playerModel, if the player is new, create a new doc.
+     * @param playerUUID Player's Microsoft-assigned UUID
      */
-    public PlayerModel(UUID uuid) {
-        Document playerDoc = collection.find(Filters.eq("uuid", uuid.toString())).first();
-        if (playerDoc == null) {
+    public PlayerModel(UUID playerUUID) {
+        this.playerUUID = playerUUID;
+        this.player = getDocument();
+
+        if (this.player == null) {
             List<String> invites = new ArrayList<>();
-            Document newPlayerDoc = new Document("uuid", uuid.toString())
+            Document newPlayerDoc = new Document("uuid", playerUUID.toString())
                     .append("enclave", null)
-                    .append("invites", invites)
-                    .append("username", Bukkit.getPlayer(uuid).getName());
-            collection.insertOne(newPlayerDoc);
-        } else {
-            playerUUID = uuid;
+                    .append("invites", invites);
+            this.collection.insertOne(newPlayerDoc);
         }
     }
 
     /**
-     * Change the player's guild (overwrite)
-     * @param uuid
+     * Get the query document for the current player.
+     * @return Document Update document
      */
-    public void setEnclave(UUID uuid) {
-        collection.findOneAndUpdate(new Document("uuid", playerUUID.toString()), Updates.set("enclave", uuid.toString()));
+    private Document queryDocument() {
+        return new Document("uuid", playerUUID.toString());
     }
 
     /**
-     * Get the user's enclave
-     * @return EnclaveModel
+     * Get the query document for the current player.
+     * @return Document Update document
+     */
+    private Document getDocument() {
+        return this.collection.find(queryDocument()).first();
+    }
+
+    /**
+     * Execute bson on the current region.
+     * @param bson Update document
+     */
+    private void updatePlayer(Bson bson) {
+        this.collection.findOneAndUpdate(queryDocument(), bson);
+    }
+
+    /**
+     * Change the player's enclave. This will overwrite.
+     * Make sure the player is not the owner of another enclave before using this method.
+     * @param enclaveUUID The UUID of the new enclave.
+     */
+    public void setEnclave(UUID enclaveUUID) {
+        updatePlayer(Updates.set("enclave", enclaveUUID.toString()));
+    }
+
+    /**
+     * Get the enclave the player is a member of, if any.
+     * @return EnclaveModel returns null if there is no enclave.
      */
     public EnclaveModel getEnclave() {
-        Document playerDoc = collection.find(Filters.eq("uuid", playerUUID.toString())).first();
-        assert playerDoc != null;
-        String uuid = playerDoc.getString("enclave");
+        String uuid = player.getString("enclave");
         if(uuid != null){
             return new EnclaveModel(UUID.fromString(uuid));
         }else{
@@ -70,16 +87,11 @@ public class PlayerModel {
         return getEnclave() != null;
     }
 
-    public void addInvite(UUID enclaveUUID) {
-        collection.findOneAndUpdate(new Document("uuid", playerUUID), Updates.addToSet("invites", enclaveUUID.toString()));
-    }
-
     /**
-     * Get the player's username
-     * @return String
+     * Invite the player to join an enclave.
      */
-    public String getUsername() {
-        return getOnlinePlayer().getName();
+    public void addInvite(UUID enclaveUUID) {
+        updatePlayer(Updates.addToSet("invites", enclaveUUID.toString()));
     }
 
     /**
@@ -89,14 +101,5 @@ public class PlayerModel {
     public UUID getPlayerUUID() {
         return playerUUID;
     }
-
-    /**
-     * Get the online player
-     * @return Player
-     */
-    public Player getOnlinePlayer() {
-        return Bukkit.getPlayer(playerUUID);
-    }
-
 
 }

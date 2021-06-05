@@ -93,7 +93,7 @@ public class EnclaveManager {
             if (playerModel.hasEnclave()) {
                 if (playerModel.getEnclave().getOwner().toString().equalsIgnoreCase(player.getUniqueId().toString())) {
                     if (region.getEnclave().getUUID().toString().equalsIgnoreCase(playerModel.getEnclave().getUUID().toString())) {
-                        region.unclaimChunk(playerModel.getEnclave().getUUID());
+                        region.unclaimChunk();
                         MessageUtils.sendMessage(player, "Region unclaimed.");
                     } else {
                         MessageUtils.sendMessage(player, "This region does not belong to your enclave.");

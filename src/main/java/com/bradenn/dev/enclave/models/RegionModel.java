@@ -14,38 +14,75 @@ public class RegionModel {
 
     private final World world;
     private final Chunk chunk;
-    private final Document document;
+    private final Document region;
 
-    MongoCollection<Document> collection = Database.getCollection("regions");
+    private final MongoCollection<Document> collection = Database.getCollection("regions");
 
+    /**
+     * @deprecated World param is redundant, as a chunk always contains world data.
+     * @param chunk Bukkit Chunk
+     * @param world Bukkit World
+     */
     public RegionModel(Chunk chunk, World world) {
         this.chunk = chunk;
         this.world = world;
-        this.document = getDocument();
+        this.region = getDocument();
     }
 
+    /**
+     * Get the region data for a given chunk.
+     * @param chunk Bukkit Chunk
+     */
     public RegionModel(Chunk chunk) {
         this.chunk = chunk;
         this.world = chunk.getWorld();
-        this.document = getDocument();
+        this.region = getDocument();
     }
 
-    private Document getDocument() {
-        Bson query = Filters.and(
+    /**
+     * Get the query document for the current region.
+     * @return Bson Update document
+     */
+    private Bson queryDocument() {
+        return Filters.and(
                 Filters.eq("x", chunk.getX()),
                 Filters.eq("z", chunk.getZ()),
                 Filters.eq("world", world.getName()));
-        return collection.find(query).first();
     }
 
+    /**
+     * Get the query document for the current region.
+     * @return Document Update document
+     */
+    private Document getDocument() {
+        return this.collection.find(queryDocument()).first();
+    }
+
+    /**
+     * Execute bson on the current region.
+     * @param bson Update document
+     */
+    private void updateRegion(Bson bson) {
+        this.collection.findOneAndUpdate(queryDocument(), bson);
+    }
+
+    /**
+     * Determine whether the current chunk is claimed or not.
+     */
     public boolean isClaimed() {
-        if (document != null) {
-            return !document.isEmpty();
+        if (region != null) {
+            return !region.isEmpty();
         } else {
             return false;
         }
     }
 
+    /**
+     * Determine whether a region is claimed by a provided enclave.
+     * This is essentially a macro of isClaimed.
+     * @param enclaveUUID The target enclave UUID.
+     * @return boolean returns true if the provided enclave owns the region.
+     */
     public boolean isEnclave(UUID enclaveUUID) {
         if (isClaimed()) {
             return getEnclave().getUUID().equals(enclaveUUID);
@@ -53,28 +90,36 @@ public class RegionModel {
         return false;
     }
 
+    /**
+     * Get the enclave owning the current region, if any.
+     * @return EnclaveModel returns null if the chunk is not claimed.
+     */
     public EnclaveModel getEnclave() {
         if (isClaimed()) {
-            return new EnclaveModel(UUID.fromString(document.getString("enclave")));
+            return new EnclaveModel(UUID.fromString(region.getString("enclave")));
         } else {
             return null;
         }
     }
 
-    public void claimChunk(UUID enclave) {
+    /**
+     * Claim this region for a given enclave.
+     * This method will overwrite previous ownership.
+     * @param enclaveUUID UUID of the target enclave.
+     */
+    public void claimChunk(UUID enclaveUUID) {
         Document chunkDoc = new Document("x", chunk.getX())
                 .append("z", chunk.getZ())
                 .append("world", world.getName())
-                .append("enclave", enclave.toString());
-        collection.insertOne(chunkDoc);
+                .append("enclave", enclaveUUID.toString());
+        this.collection.insertOne(chunkDoc);
     }
 
-    public void unclaimChunk(UUID enclave) {
-        Document chunkDoc = new Document("x", chunk.getX())
-                .append("z", chunk.getZ())
-                .append("world", world.getName())
-                .append("enclave", enclave.toString());
-        collection.findOneAndDelete(chunkDoc);
+    /**
+     * Unclaim this region for a given enclave.
+     */
+    public void unclaimChunk() {
+        this.collection.findOneAndDelete(region);
     }
 
 
