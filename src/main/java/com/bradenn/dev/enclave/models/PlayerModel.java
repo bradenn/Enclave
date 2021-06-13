@@ -7,8 +7,10 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class PlayerModel {
 
@@ -88,10 +90,25 @@ public class PlayerModel {
     }
 
     /**
-     * Invite the player to join an enclave.
+     * Invite the player to join an enclave. This will overwrite any current invites.
      */
     public void addInvite(UUID enclaveUUID) {
-        updatePlayer(Updates.addToSet("invites", enclaveUUID.toString()));
+        Document doc = new Document("enclave", enclaveUUID.toString()).append("date", new Date());
+        updatePlayer(Updates.set("invite", doc));
+    }
+
+    /**
+     * Get all invites sent to the player.
+     */
+    public UUID getInvite() {
+        Document invite = player.get("invite", Document.class);
+        Date inviteSent = invite.getDate("date");
+        if(new Date().getTime() - inviteSent.getTime() <= TimeUnit.SECONDS.toMillis(2000)){
+            String enclaveString = invite.getString("enclave");
+            return UUID.fromString(enclaveString);
+        }else{
+            return null;
+        }
     }
 
     /**

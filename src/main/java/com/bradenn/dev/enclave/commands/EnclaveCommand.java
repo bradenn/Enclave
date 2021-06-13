@@ -19,6 +19,7 @@ public class EnclaveCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command,
                              @NotNull String s, String[] args) {
+
         if (!(commandSender instanceof Player)) {
             commandSender.sendMessage("Enclave commands are only available for players.");
             return true;
@@ -35,6 +36,9 @@ public class EnclaveCommand implements CommandExecutor, TabCompleter {
                                 break;
                             case "here":
                                 RegionManager.showRegionInfo(player);
+                                break;
+                            case "join":
+                                enclaveManager.joinEnclave();
                                 break;
                             default:
                                 CommandHelp.sendNoobHelp(player);
@@ -76,6 +80,9 @@ public class EnclaveCommand implements CommandExecutor, TabCompleter {
                                 break;
                             case "claim":
                                 enclaveManager.claimRegion();
+                                break;
+                            case "leave":
+                                enclaveManager.leaveEnclave();
                                 break;
                             case "here":
                                 RegionManager.showRegionInfo(player);
@@ -120,6 +127,7 @@ public class EnclaveCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command,
                                       @NotNull String s, String[] args) {
+        
         Map<String, List<String>> commands = new HashMap<>();
 
         commands.put("claim", new ArrayList<>());

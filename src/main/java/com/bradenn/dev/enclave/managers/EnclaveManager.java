@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class EnclaveManager {
@@ -49,10 +50,10 @@ public class EnclaveManager {
                 EnclaveModel enclaveModel = new EnclaveModel(player.getUniqueId(), name);
                 MessageUtils.sendMessage(player, "Created the enclave '" + enclaveModel.getName() + "'.");
             } else {
-                MessageUtils.sendMessage(player, "Your enclave name must not include any special characters.");
+                MessageUtils.sendError(player, "Your enclave name must not include any special characters.");
             }
         } else {
-            MessageUtils.sendMessage(player, "You must disband your current enclave, '" + enclave.getName() + "' before creating a new one.");
+            MessageUtils.sendError(player, "You must disband your current enclave, '" + enclave.getName() + "' before creating a new one.");
         }
     }
 
@@ -62,33 +63,33 @@ public class EnclaveManager {
                 MessageUtils.sendMessage(player, "Disbanded the enclave '" + enclave.getName() + "'.");
                 enclave.disbandEnclave();
             } else {
-                MessageUtils.sendMessage(player, "You must be the owner to disband an enclave; use '/e leave' to leave the enclave.");
+                MessageUtils.sendError(player, "You must be the owner to disband an enclave; use '/e leave' to leave the enclave.");
             }
         } else {
-            MessageUtils.sendMessage(player, "You must create an Enclave before you can disband it.");
+            MessageUtils.sendError(player, "You must create an Enclave before you can disband it. You must be French.");
         }
     }
 
     public void claimRegion() {
         if (region.isClaimed()) {
-            MessageUtils.sendMessage(player, "This region is already claimed.");
+            MessageUtils.sendError(player, "This region is already claimed.");
         } else {
             if (playerModel.hasEnclave()) {
                 if (playerModel.getEnclave().isOwner(player.getUniqueId())) {
                     region.claimChunk(playerModel.getEnclave().getUUID());
                     MessageUtils.sendMessage(player, "Region claimed.");
                 } else {
-                    MessageUtils.sendMessage(player, "You must be the enclave owner to claim land.");
+                    MessageUtils.sendError(player, "You must be the enclave owner to claim land.");
                 }
             } else {
-                MessageUtils.sendMessage(player, "You must create an Enclave before you can claim land; use '/e create [name]'");
+                MessageUtils.sendError(player, "You must create an Enclave before you can claim land; use '/e create [name]'");
             }
         }
     }
 
     public void unclaimRegion() {
         if (!region.isClaimed()) {
-            MessageUtils.sendMessage(player, "This region is not claimed.");
+            MessageUtils.sendError(player, "This region is not claimed.");
         } else {
             if (playerModel.hasEnclave()) {
                 if (playerModel.getEnclave().getOwner().toString().equalsIgnoreCase(player.getUniqueId().toString())) {
@@ -96,13 +97,13 @@ public class EnclaveManager {
                         region.unclaimChunk();
                         MessageUtils.sendMessage(player, "Region unclaimed.");
                     } else {
-                        MessageUtils.sendMessage(player, "This region does not belong to your enclave.");
+                        MessageUtils.sendError(player, "This region does not belong to your enclave.");
                     }
                 } else {
-                    MessageUtils.sendMessage(player, "You must be the enclave owner to unclaim land.");
+                    MessageUtils.sendError(player, "You must be the enclave owner to unclaim land.");
                 }
             } else {
-                MessageUtils.sendMessage(player, "You must create an Enclave before you can unclaim land; use '/e create [name]'");
+                MessageUtils.sendError(player, "You must create an Enclave before you can unclaim land; use '/e create [name]'");
             }
         }
     }
@@ -113,16 +114,17 @@ public class EnclaveManager {
                 Player targetPlayer = parsePlayer(target);
                 PlayerModel targetPlayerModel = new PlayerModel(targetPlayer.getUniqueId());
                 if (targetPlayerModel.hasEnclave()) {
-                    MessageUtils.sendMessage(player, "This player is already in an Enclave. They must leave first.");
+                    MessageUtils.sendError(player, "This player is already in an Enclave. They must leave first.");
                 } else {
                     targetPlayerModel.addInvite(enclave.getUUID());
-                    MessageUtils.sendMessage(targetPlayer, "You have been invited to join '" + enclave.getName() + "'. Type /e accept " + enclave.getName() + " to accept and join.");
+                    MessageUtils.sendMessage(player, "An invite has been sent.");
+                    MessageUtils.sendMessage(targetPlayer, "You have been invited to join '" + enclave.getName() + "'. Type /e join to accept and join.");
                 }
             } else {
-                MessageUtils.sendMessage(player, "That player does not exist.");
+                MessageUtils.sendError(player, "That player does not exist.");
             }
         } else {
-            MessageUtils.sendMessage(player, "You must create or join an enclave before you can invite someone to join.");
+            MessageUtils.sendError(player, "You must create or join an enclave before you can invite someone to join.");
         }
     }
 
@@ -169,10 +171,10 @@ public class EnclaveManager {
                 MessageUtils.sendMessage(player, "Your enclave home as been set to your current position.");
                 enclave.setHome(player.getLocation());
             } else {
-                MessageUtils.sendMessage(player, "An enclave home can only be set within your Enclave. Silly goose!");
+                MessageUtils.sendError(player, "An enclave home can only be set within your Enclave. Silly goose!");
             }
         } else {
-            MessageUtils.sendMessage(player, "You must be the owner of the enclave to set a home.");
+            MessageUtils.sendError(player, "You must be the owner of the enclave to set a home.");
         }
     }
 
@@ -180,14 +182,46 @@ public class EnclaveManager {
         if (enclave.hasMember(playerModel.getPlayerUUID())) {
             Location loc = enclave.getHome();
             if (loc == null) {
-                MessageUtils.sendMessage(player, "Your enclave does not have a home set.");
+                MessageUtils.sendError(player, "Your enclave does not have a home set.");
             } else {
                 player.teleport(loc);
                 MessageUtils.sendMessage(player, "You have teleported to your enclave's home.");
                 ParticleRenderer.beamUp(player.getLocation().add(0, 0, 0), net.md_5.bungee.api.ChatColor.of(enclave.getColor()).getColor());
             }
         } else {
-            MessageUtils.sendMessage(player, "Interesting, inform your local developer of this message. You may be entitled to zero compensation. Error Code #69420");
+            MessageUtils.sendError(player, "Interesting, inform your local developer of this message. You may be entitled to zero compensation. Error Code #69420");
+        }
+    }
+
+    public void joinEnclave() {
+        UUID enclaveUUID = playerModel.getInvite();
+        if (enclaveUUID != null) {
+            if (!enclave.isValid()) {
+                EnclaveModel em = new EnclaveModel(enclaveUUID);
+                em.addMember(playerModel.getPlayerUUID());
+                playerModel.setEnclave(enclaveUUID);
+                MessageUtils.sendMessage(player, "You have joined the enclave " + em.getDisplayName());
+            } else {
+                MessageUtils.sendError(player, "You are already in an enclave. How tf did this even happen?");
+            }
+        } else {
+            MessageUtils.sendError(player, "You have not been invited to an enclave.");
+        }
+
+    }
+
+    public void leaveEnclave() {
+        if (enclave.hasMember(playerModel.getPlayerUUID())) {
+            if (!enclave.isOwner(playerModel.getPlayerUUID())) {
+                enclave.removeMember(playerModel.getPlayerUUID());
+                playerModel.setEnclave(null);
+                MessageUtils.sendMessage(player, "You have left the enclave.");
+            } else {
+                MessageUtils.sendError(player, "You are the owner of this enclave. You must disband it before leaving.");
+
+            }
+        } else {
+            MessageUtils.sendError(player, "You don't have an enclave to leave, how did you get here anyhow?");
         }
     }
 

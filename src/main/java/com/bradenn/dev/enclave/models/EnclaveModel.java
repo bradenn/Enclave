@@ -171,6 +171,20 @@ public class EnclaveModel {
     }
 
     /**
+     * Add a member to the enclave. You must also assign the player's enclave from the Player Model.
+     */
+    public void addMember(UUID uuid) {
+        updateEnclave(Updates.addToSet("members", uuid.toString()));
+    }
+
+    /**
+     * Add a member to the enclave. You must also assign the player's enclave from the Player Model.
+     */
+    public void removeMember(UUID uuid) {
+        updateEnclave(Updates.pull("members", uuid.toString()));
+    }
+
+    /**
      * Set the name of the enclave (overwrite)
      */
     public void setName(String name) {
