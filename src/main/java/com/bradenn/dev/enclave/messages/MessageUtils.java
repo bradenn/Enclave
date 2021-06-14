@@ -46,6 +46,16 @@ public class MessageUtils {
         player.sendMessage(getErrorPrefix() + format(message));
     }
 
+    public static void sendError(Player player, Response response) {
+        player.sendMessage(getErrorPrefix() + format(response.getMessage()));
+    }
+
+    public static void send(Player player, Response response, String... args) {
+        String prepared = String.format(response.getMessage(), (Object) args);
+        String prefix = response.isError()?getErrorPrefix():getInfoPrefix();
+        player.sendMessage(prefix + format(prepared));
+    }
+
     public static void sendMessage(Player player, String message, boolean success) {
         player.sendMessage(getPrefix() + format(message));
     }

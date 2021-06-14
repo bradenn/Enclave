@@ -82,6 +82,14 @@ public class PlayerModel {
     }
 
     /**
+     * Clear the player's current enclave. This will override everything.
+     * Ensure the player is removed from the enclave before calling this function.
+     */
+    public void clearEnclave() {
+        updatePlayer(Updates.set("enclave", null));
+    }
+
+    /**
      * Check if player is a member of an Enclave
      * @return boolean
      */
