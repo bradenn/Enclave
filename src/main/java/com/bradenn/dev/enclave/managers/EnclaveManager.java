@@ -3,7 +3,7 @@ package com.bradenn.dev.enclave.managers;
 import com.bradenn.dev.enclave.messages.MessageUtils;
 import com.bradenn.dev.enclave.messages.Response;
 import com.bradenn.dev.enclave.models.EnclaveModel;
-import com.bradenn.dev.enclave.models.EnclaveTag;
+import com.bradenn.dev.enclave.models.Tag;
 import com.bradenn.dev.enclave.models.PlayerModel;
 import com.bradenn.dev.enclave.models.RegionModel;
 import com.bradenn.dev.enclave.renderers.ParticleRenderer;
@@ -54,10 +54,11 @@ public class EnclaveManager {
     /**
      * If the user is not a member of an enclave, create a new one.
      * This function also performs name checks.
+     *
      * @param name The name of the enclave
      */
     public void createEnclave(String name) {
-        if (enclave == null) {
+        if (!isMember()) {
             if (validateName(name)) {
                 EnclaveModel enclaveModel = new EnclaveModel(player.getUniqueId(), name);
                 MessageUtils.send(player, Response.ENCLAVE_CREATED, enclaveModel.getName());
@@ -73,16 +74,17 @@ public class EnclaveManager {
      * If the user is the owner of an enclave, delete it.
      */
     public void disbandEnclave() {
-        if (enclave.isValid()) {
-            if (enclave.isOwner(player.getUniqueId())) {
-                MessageUtils.send(player, Response.ENCLAVE_DISBANDED, enclave.getName());
+        if (isOwner()) {
+            if (enclave.isValid()) {
                 enclave.disbandEnclave();
+                MessageUtils.send(player, Response.ENCLAVE_DISBANDED, enclave.getName());
             } else {
-                MessageUtils.send(player, Response.E_INSUFFICIENT_CLOUT, enclave.getName());
+                MessageUtils.send(player, Response.E_NO_ENCLAVE);
             }
         } else {
-            MessageUtils.send(player, Response.E_NO_ENCLAVE);
+            MessageUtils.send(player, Response.E_INSUFFICIENT_CLOUT, enclave.getName());
         }
+
     }
 
     /**
@@ -147,25 +149,19 @@ public class EnclaveManager {
     }
 
     public void setColor(String target) {
-
-        Pattern p = Pattern.compile("^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$");
-        List<String> colors = new ArrayList<>();
-        new ArrayList<>(Arrays.asList(ChatColor.values())).forEach(chatColor -> {
-            if (chatColor != ChatColor.MAGIC)
-                colors.add(chatColor.name());
-        });
-
-        if (p.matcher(target).matches() || colors.contains(target.toUpperCase())) {
-            enclave.setColor(target.toUpperCase());
-            MessageUtils.send(player, Response.COLOR_CHANGED, target);
-        } else {
-            MessageUtils.send(player, Response.E_INVALID_COLOR);
+        if (isOwner()) {
+            if (validateColor(target)) {
+                enclave.setColor(target.toUpperCase());
+                MessageUtils.send(player, Response.COLOR_CHANGED, target);
+            } else {
+                MessageUtils.send(player, Response.E_INVALID_COLOR);
+            }
         }
     }
 
     public void toggleTag(String arg) {
-        if (enclave.isOwner(playerModel.getPlayerUUID())) {
-            if (enclave.toggleTag(EnclaveTag.valueOf(arg))) {
+        if (isOwner()) {
+            if (enclave.toggleTag(Tag.valueOf(arg.toUpperCase()))) {
                 MessageUtils.send(player, Response.TAG_DISABLED, arg);
             } else {
                 MessageUtils.send(player, Response.TAG_ENABLED, arg);
@@ -177,17 +173,17 @@ public class EnclaveManager {
 
     public void getTags() {
         List<String> diff = new ArrayList<>();
-        for (EnclaveTag value : EnclaveTag.values()) {
+        for (Tag value : Tag.values()) {
             if (!enclave.getTags().contains(value.name())) diff.add(value.name());
         }
 
         MessageUtils.send(player, Response.TAG_LIST_ENABLED, diff.toString());
-        MessageUtils.send(player, Response.TAG_LIST_DISABLED,  enclave.getTags().toString());
+        MessageUtils.send(player, Response.TAG_LIST_DISABLED, enclave.getTags().toString());
 
     }
 
     public void setHome() {
-        if (enclave.isOwner(playerModel.getPlayerUUID())) {
+        if (isOwner()) {
             if (region.isEnclave(enclave.getUUID())) {
                 MessageUtils.send(player, Response.HOME_SET);
                 enclave.setHome(player.getLocation());
@@ -200,7 +196,7 @@ public class EnclaveManager {
     }
 
     public void goHome() {
-        if (enclave.hasMember(playerModel.getPlayerUUID())) {
+        if (isMember()) {
             Location loc = enclave.getHome();
             if (loc == null) {
                 MessageUtils.send(player, Response.E_NO_HOME);
@@ -232,8 +228,8 @@ public class EnclaveManager {
     }
 
     public void leaveEnclave() {
-        if (enclave.hasMember(playerModel.getPlayerUUID())) {
-            if (!enclave.isOwner(playerModel.getPlayerUUID())) {
+        if (isMember()) {
+            if (!isOwner()) {
                 enclave.removeMember(playerModel.getPlayerUUID());
                 playerModel.clearEnclave();
                 MessageUtils.send(player, Response.ENCLAVE_LEFT);
@@ -243,6 +239,34 @@ public class EnclaveManager {
         } else {
             MessageUtils.send(player, Response.E_NO_ENCLAVE);
         }
+    }
+
+
+    /**
+     * Verify player clout
+     */
+    private boolean isOwner() {
+        return isMember() && enclave.isOwner(playerModel.getPlayerUUID());
+    }
+
+    /**
+     * Verify player membership
+     */
+    private boolean isMember() {
+        return (enclave != null) && enclave.hasMember(playerModel.getPlayerUUID());
+    }
+
+    /**
+     * Validate a color input.
+     */
+    private boolean validateColor(String color) {
+        Pattern p = Pattern.compile("^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$");
+        List<String> colors = new ArrayList<>();
+        new ArrayList<>(Arrays.asList(ChatColor.values())).forEach(chatColor -> {
+            if (chatColor != ChatColor.MAGIC)
+                colors.add(chatColor.name());
+        });
+        return p.matcher(color).matches() || colors.contains(color.toUpperCase());
     }
 
     /**

@@ -51,7 +51,7 @@ public class MessageUtils {
     }
 
     public static void send(Player player, Response response, String... args) {
-        String prepared = String.format(response.getMessage(), (Object) args);
+        String prepared = String.format(response.getMessage(), args);
         String prefix = response.isError()?getErrorPrefix():getInfoPrefix();
         player.sendMessage(prefix + format(prepared));
     }

@@ -3,7 +3,7 @@ package com.bradenn.dev.enclave.commands;
 import com.bradenn.dev.enclave.managers.EnclaveManager;
 import com.bradenn.dev.enclave.managers.RegionManager;
 import com.bradenn.dev.enclave.messages.CommandHelp;
-import com.bradenn.dev.enclave.models.EnclaveTag;
+import com.bradenn.dev.enclave.models.Tag;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -140,7 +140,7 @@ public class EnclaveCommand implements CommandExecutor, TabCompleter {
         commands.put("tags", null);
 
         commands.put("color", enumList(ChatColor.values()));
-        commands.put("tag", enumList(EnclaveTag.values()));
+        commands.put("tag", enumList(Tag.values()));
 
         switch (args.length) {
             case 1:

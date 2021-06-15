@@ -17,9 +17,8 @@ public enum Response {
     HOME_SET("Your enclave home has been set to your current position."),
     E_NO_HOME("Your enclave does not have a home set.", true),
 
-
-    TAG_LIST_ENABLED("Enabled attributes: [ %s ]"),
-    TAG_LIST_DISABLED("Disabled attributes: [ %s ]"),
+    TAG_LIST_ENABLED("Enabled attributes: %s"),
+    TAG_LIST_DISABLED("Disabled attributes: %s"),
 
     ENCLAVE_JOINED("You have joined the enclave %s."),
     ENCLAVE_LEFT("You have left the enclave %s."),
@@ -49,8 +48,6 @@ public enum Response {
 
     E_INSUFFICIENT_PERMISSION("You do not have permission to do that.", true),
     E_INSUFFICIENT_CLOUT("You must be the owner of the enclave to do that.", true),
-
-
     ;
 
     private final String message;

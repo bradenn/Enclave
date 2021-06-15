@@ -1,6 +1,6 @@
 package com.bradenn.dev.enclave.models;
 
-public enum EnclaveTag {
+public enum Tag {
     FIRE_SPREAD,
     EXPLOSIONS,
     PVP, // TEST

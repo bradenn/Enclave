@@ -258,7 +258,7 @@ public class EnclaveModel {
      * Check if a tag attribute has been disabled in this enclave.
      * @return boolean If true, the tag attribute is disabled.
      */
-    public boolean checkTag(EnclaveTag tag) {
+    public boolean checkTag(Tag tag) {
         String serializedTag = tag.toString();
         return getTags().contains(serializedTag);
     }
@@ -269,7 +269,7 @@ public class EnclaveModel {
      * @param tag The EnclaveTag to toggle
      * @return boolean
      */
-    public boolean toggleTag(EnclaveTag tag) {
+    public boolean toggleTag(Tag tag) {
         // Get the current tag list from the enclave document.
         List<String> tagList = getTags();
         String serializedTag = tag.toString();
