@@ -1,3 +1,12 @@
+quotas:
+  default:
+    chunks:
+      private: 16
+      public: 2
+    members: -1
+    warps: 2
+worlds:
+  - "world"
 mongo:
   uri: "mongodb://localhost:27017/enclaves"
   database: "enclaves"

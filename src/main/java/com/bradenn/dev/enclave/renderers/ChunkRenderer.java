@@ -3,8 +3,7 @@ package com.bradenn.dev.enclave.renderers;
 import com.bradenn.dev.enclave.models.RegionModel;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Chunk;
-import org.bukkit.Color;
-import org.bukkit.Particle;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -21,21 +20,35 @@ public class ChunkRenderer {
 
     public void outlineChunk(Chunk chunk) {
         RegionModel rm = new RegionModel(chunk);
+        World world = chunk.getWorld();
         if (rm.isClaimed()) {
-            World world = chunk.getWorld();
-            java.awt.Color c = ChatColor.of(rm.getEnclave().getColor()).getColor();
-            Particle.DustOptions du = new Particle.DustOptions(Color.fromRGB(c.getRed(), c.getGreen(), c.getBlue()), 1);
-            for (double i = 0; i < 16; i += 0.5) {
-                int cx = chunk.getX() * 16;
-                int cz = chunk.getZ() * 16;
-                double cy = Objects.requireNonNull(world).getHighestBlockYAt(cx, cz) + 1.5;
-                world.spawnParticle(Particle.REDSTONE, cx + i, cy, cz, 0, 0, 0, 0, du);
-                world.spawnParticle(Particle.REDSTONE, cx, cy, cz + i, 0, 0, 0, 0, du);
-                world.spawnParticle(Particle.REDSTONE, cx + 16, cy, cz + i, 0, 0, 0, 0, du);
-                world.spawnParticle(Particle.REDSTONE, cx + i, cy, cz + 16, 0, 0, 0, 0, du);
+            ParticleDust particleDust = new ParticleDust(ChatColor.of(rm.getEnclave().getColor()));
+            for (double i = 0; i < 16; i += 1) {
+                double cx = chunk.getX() * 16;
+                double cz = chunk.getZ() * 16;
+                double cy = Objects.requireNonNull(world).getHighestBlockYAt((int) cx, (int) cz) + 1.5;
+
+                Location north = new Location(world, cx + i, cy, cz);
+                north.setY(world.getHighestBlockYAt(north.getBlockX(), north.getBlockZ()) + 1.5);
+                north.add(0.5, 0, 0.5);
+                particleDust.spawn(north);
+
+                Location south = new Location(world, cx + i, cy, cz + 15);
+                south.add(0.5, 0, 0.5);
+                south.setY(world.getHighestBlockYAt(south.getBlockX(), south.getBlockZ()) + 1.5);
+                particleDust.spawn(south);
+
+                Location west = new Location(world, cx, cy, cz + i);
+                west.add(0.5, 0, 0.5);
+                west.setY(world.getHighestBlockYAt(west.getBlockX(), west.getBlockZ()) + 1.5);
+                particleDust.spawn(west);
+
+                Location east = new Location(world, cx + 15, cy, cz + i);
+                east.setY(world.getHighestBlockYAt(east.getBlockX(), east.getBlockZ()) + 1.5);
+                east.add(0.5, 0, 0.5);
+                particleDust.spawn(east);
+
             }
-
-
         }
     }
 
