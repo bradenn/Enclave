@@ -33,7 +33,7 @@ public class RegionManager {
 
         String stringBuilder = MessageUtils.getInfoPrefix() +
                 "Region Information\n" +
-                formatLine("Chunk", String.format("X: %d, Z: %d", chunk.getX(), chunk.getZ())) +
+                formatLine("Chunk", String.format("(%d, %d)", chunk.getX(), chunk.getZ())) +
                 formatLine("Status", regionModel.isClaimed() ? "Claimed" : "Unclaimed") +
                 formatLine("Enclave", regionModel.isClaimed() ? regionModel.getEnclave().getDisplayName() : "N/A");
 

@@ -1,14 +1,16 @@
 package com.bradenn.dev.enclave.managers;
 
+import com.bradenn.dev.enclave.messages.MessageBlock;
 import com.bradenn.dev.enclave.messages.MessageUtils;
 import com.bradenn.dev.enclave.messages.Response;
 import com.bradenn.dev.enclave.models.EnclaveModel;
-import com.bradenn.dev.enclave.models.Tag;
 import com.bradenn.dev.enclave.models.PlayerModel;
 import com.bradenn.dev.enclave.models.RegionModel;
+import com.bradenn.dev.enclave.models.Tag;
 import com.bradenn.dev.enclave.renderers.ParticleRenderer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -41,6 +43,39 @@ public class EnclaveManager {
         this.region = new RegionModel(player.getLocation().getChunk());
         this.playerModel = new PlayerModel(player.getUniqueId());
         this.player = player;
+    }
+
+    public void sendHelp() {
+        MessageBlock commandInfo = new MessageBlock("Available Commands");
+        commandInfo.addLine("create", "[name] Create an enclave");
+        commandInfo.addLine("invite", "[player] Invite a player to your enclave");
+        commandInfo.addLine("color", "[color] Change your enclave color");
+        commandInfo.addLine("rename", "[name] Change your enclave name");
+        commandInfo.addLine("map", "Get a map of nearby enclaves");
+        commandInfo.addLine("claim", "Claim regions for your enclave");
+        commandInfo.addLine("unclaim", "Unclaim regions for your enclave");
+        commandInfo.addLine("disband", "Disband your enclave");
+        commandInfo.addLine("info", "Get info about a region");
+        player.sendMessage(commandInfo.getMessage());
+    }
+
+    public void sendNoobHelp() {
+        MessageBlock commandInfo = new MessageBlock("Available Commands");
+        commandInfo.addLine("create", "[name] Create an enclave");
+        commandInfo.addLine("map", "Get a map of nearby enclaves");
+        commandInfo.addLine("here", "Get info about a region");
+        player.sendMessage(commandInfo.getMessage());
+    }
+
+    public void getInfo() {
+        Chunk chunk = player.getLocation().getChunk();
+        MessageBlock regionInfo = new MessageBlock("Region Information");
+        regionInfo.addLine("chunk", String.format("(%d, %d)", chunk.getX(), chunk.getZ()));
+        regionInfo.addLine("status", region.isClaimed() ? "Claimed" : "Unclaimed");
+        if (region.isClaimed()) {
+            regionInfo.addLine("enclave", region.getEnclave().getDisplayName());
+        }
+        player.sendMessage(regionInfo.getMessage());
     }
 
     public boolean isValid() {
@@ -291,5 +326,19 @@ public class EnclaveManager {
         return Bukkit.getPlayer(name);
     }
 
-
+    /**
+     * Rename the enclave.
+     */
+    public void renameEnclave(String name) {
+        if (isOwner()) {
+            if (validateName(name)) {
+                enclave.setName(name);
+                MessageUtils.send(player, Response.ENCLAVE_NAME_CHANGED, name);
+            } else {
+                MessageUtils.send(player, Response.E_INVALID_ENCLAVE_NAME);
+            }
+        } else {
+            MessageUtils.send(player, Response.E_INSUFFICIENT_CLOUT);
+        }
+    }
 }

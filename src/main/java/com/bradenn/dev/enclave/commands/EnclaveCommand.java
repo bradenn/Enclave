@@ -2,7 +2,6 @@ package com.bradenn.dev.enclave.commands;
 
 import com.bradenn.dev.enclave.managers.EnclaveManager;
 import com.bradenn.dev.enclave.managers.RegionManager;
-import com.bradenn.dev.enclave.messages.CommandHelp;
 import com.bradenn.dev.enclave.models.Tag;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -12,14 +11,16 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class EnclaveCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command,
                              @NotNull String s, String[] args) {
-
         if (!(commandSender instanceof Player)) {
             commandSender.sendMessage("Enclave commands are only available for players.");
             return true;
@@ -35,13 +36,13 @@ public class EnclaveCommand implements CommandExecutor, TabCompleter {
                                 RegionManager.showBorders(player);
                                 break;
                             case "here":
-                                RegionManager.showRegionInfo(player);
+                                enclaveManager.getInfo();
                                 break;
                             case "join":
                                 enclaveManager.joinEnclave();
                                 break;
                             default:
-                                CommandHelp.sendNoobHelp(player);
+                                enclaveManager.sendNoobHelp();
                                 break;
                         }
                         break;
@@ -51,12 +52,12 @@ public class EnclaveCommand implements CommandExecutor, TabCompleter {
                                 enclaveManager.createEnclave(args[1]);
                                 break;
                             default:
-                                CommandHelp.sendNoobHelp(player);
+                                enclaveManager.sendNoobHelp();
                                 break;
                         }
                         break;
                     default:
-                        CommandHelp.sendNoobHelp(player);
+                        enclaveManager.sendNoobHelp();
                         break;
                 }
             } else {
@@ -85,13 +86,13 @@ public class EnclaveCommand implements CommandExecutor, TabCompleter {
                                 enclaveManager.leaveEnclave();
                                 break;
                             case "here":
-                                RegionManager.showRegionInfo(player);
+                                enclaveManager.getInfo();
                                 break;
                             case "tags":
                                 enclaveManager.getTags();
                                 break;
                             default:
-                                CommandHelp.sendHelp(player);
+                                enclaveManager.sendHelp();
                                 break;
                         }
                         break;
@@ -99,6 +100,9 @@ public class EnclaveCommand implements CommandExecutor, TabCompleter {
                         switch (args[0].toLowerCase()) {
                             case "create":
                                 enclaveManager.createEnclave(args[1]);
+                                break;
+                            case "rename":
+                                enclaveManager.renameEnclave(args[1]);
                                 break;
                             case "invite":
                                 enclaveManager.inviteMember(args[1]);
@@ -110,12 +114,12 @@ public class EnclaveCommand implements CommandExecutor, TabCompleter {
                                 enclaveManager.toggleTag(args[1]);
                                 break;
                             default:
-                                CommandHelp.sendHelp(player);
+                                enclaveManager.sendHelp();
                                 break;
                         }
                         break;
                     default:
-                        CommandHelp.sendHelp(player);
+                        enclaveManager.sendHelp();
                         break;
                 }
             }
@@ -133,6 +137,7 @@ public class EnclaveCommand implements CommandExecutor, TabCompleter {
         commands.put("claim", new ArrayList<>());
         commands.put("unclaim", new ArrayList<>());
         commands.put("invite", null);
+        commands.put("rename", new ArrayList<>());
         commands.put("map", new ArrayList<>());
         commands.put("here", new ArrayList<>());
         commands.put("disband", new ArrayList<>());

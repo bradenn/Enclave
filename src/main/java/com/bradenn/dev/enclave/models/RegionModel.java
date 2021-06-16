@@ -8,6 +8,7 @@ import org.bson.conversions.Bson;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 
+import java.util.Date;
 import java.util.UUID;
 
 public class RegionModel {
@@ -19,9 +20,9 @@ public class RegionModel {
     private final MongoCollection<Document> collection = Database.getCollection("regions");
 
     /**
-     * @deprecated World param is redundant, as a chunk always contains world data.
      * @param chunk Bukkit Chunk
      * @param world Bukkit World
+     * @deprecated World param is redundant, as a chunk always contains world data.
      */
     public RegionModel(Chunk chunk, World world) {
         this.chunk = chunk;
@@ -31,6 +32,7 @@ public class RegionModel {
 
     /**
      * Get the region data for a given chunk.
+     *
      * @param chunk Bukkit Chunk
      */
     public RegionModel(Chunk chunk) {
@@ -41,6 +43,7 @@ public class RegionModel {
 
     /**
      * Get the query document for the current region.
+     *
      * @return Bson Update document
      */
     private Bson queryDocument() {
@@ -52,6 +55,7 @@ public class RegionModel {
 
     /**
      * Get the query document for the current region.
+     *
      * @return Document Update document
      */
     private Document getDocument() {
@@ -60,6 +64,7 @@ public class RegionModel {
 
     /**
      * Execute bson on the current region.
+     *
      * @param bson Update document
      */
     private void updateRegion(Bson bson) {
@@ -80,6 +85,7 @@ public class RegionModel {
     /**
      * Determine whether a region is claimed by a provided enclave.
      * This is essentially a macro of isClaimed.
+     *
      * @param enclaveUUID The target enclave UUID.
      * @return boolean returns true if the provided enclave owns the region.
      */
@@ -92,6 +98,7 @@ public class RegionModel {
 
     /**
      * Get the enclave owning the current region, if any.
+     *
      * @return EnclaveModel returns null if the chunk is not claimed.
      */
     public EnclaveModel getEnclave() {
@@ -105,13 +112,15 @@ public class RegionModel {
     /**
      * Claim this region for a given enclave.
      * This method will overwrite previous ownership.
+     *
      * @param enclaveUUID UUID of the target enclave.
      */
     public void claimChunk(UUID enclaveUUID) {
         Document chunkDoc = new Document("x", chunk.getX())
                 .append("z", chunk.getZ())
                 .append("world", world.getName())
-                .append("enclave", enclaveUUID.toString());
+                .append("enclave", enclaveUUID.toString())
+                .append("date", new Date());
         this.collection.insertOne(chunkDoc);
     }
 
@@ -120,6 +129,13 @@ public class RegionModel {
      */
     public void unclaimChunk() {
         this.collection.findOneAndDelete(region);
+    }
+
+    /**
+     * The time since the region was claimed.
+     */
+    public String originDate() {
+        return this.region.getDate("date").toString();
     }
 
 

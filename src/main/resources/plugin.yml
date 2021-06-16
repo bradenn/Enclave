@@ -9,13 +9,14 @@ commands:
   enclave:
     description: Interact with enclaves.
     aliases: e
-    usage: /enclave [command] [args]
+    usage: /e [command] [args]
   enclaveadmin:
-    description: Interact with enclaves, but in an admin-like way.
+    description: Interact with enclaves, but with an iron fist.
+    permission: enclave.admin
     aliases: ea
-    usage: /enclaveadmin [command] [args]
+    usage: /ea [command] [args]
 permissions:
   enclave.*:
     default: false
-  enclave.override:
+  enclave.admin:
     default: op

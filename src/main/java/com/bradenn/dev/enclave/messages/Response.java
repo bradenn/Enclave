@@ -3,6 +3,8 @@ package com.bradenn.dev.enclave.messages;
 public enum Response {
 
     /* Enclave Messages */
+    ENCLAVE_NAME_CHANGED("Enclave name has been changed to %s."),
+
     ENCLAVE_CREATED("The enclave %s has been created."),
     E_INVALID_ENCLAVE_NAME("Invalid enclave name.", true),
 

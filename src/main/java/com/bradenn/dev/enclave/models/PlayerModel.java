@@ -20,6 +20,7 @@ public class PlayerModel {
 
     /**
      * Initialize the playerModel, if the player is new, create a new doc.
+     *
      * @param playerUUID Player's Microsoft-assigned UUID
      */
     public PlayerModel(UUID playerUUID) {
@@ -30,13 +31,15 @@ public class PlayerModel {
             List<String> invites = new ArrayList<>();
             Document newPlayerDoc = new Document("uuid", playerUUID.toString())
                     .append("enclave", null)
-                    .append("invites", invites);
+                    .append("invites", invites)
+                    .append("date", new Date());
             this.collection.insertOne(newPlayerDoc);
         }
     }
 
     /**
      * Get the query document for the current player.
+     *
      * @return Document Update document
      */
     private Document queryDocument() {
@@ -45,6 +48,7 @@ public class PlayerModel {
 
     /**
      * Get the query document for the current player.
+     *
      * @return Document Update document
      */
     private Document getDocument() {
@@ -53,6 +57,7 @@ public class PlayerModel {
 
     /**
      * Execute bson on the current region.
+     *
      * @param bson Update document
      */
     private void updatePlayer(Bson bson) {
@@ -62,6 +67,7 @@ public class PlayerModel {
     /**
      * Change the player's enclave. This will overwrite.
      * Make sure the player is not the owner of another enclave before using this method.
+     *
      * @param enclaveUUID The UUID of the new enclave.
      */
     public void setEnclave(UUID enclaveUUID) {
@@ -70,13 +76,14 @@ public class PlayerModel {
 
     /**
      * Get the enclave the player is a member of, if any.
+     *
      * @return EnclaveModel returns null if there is no enclave.
      */
     public EnclaveModel getEnclave() {
         String uuid = player.getString("enclave");
-        if(uuid != null){
+        if (uuid != null) {
             return new EnclaveModel(UUID.fromString(uuid));
-        }else{
+        } else {
             return null;
         }
     }
@@ -91,6 +98,7 @@ public class PlayerModel {
 
     /**
      * Check if player is a member of an Enclave
+     *
      * @return boolean
      */
     public boolean hasEnclave() {
@@ -111,20 +119,28 @@ public class PlayerModel {
     public UUID getInvite() {
         Document invite = player.get("invite", Document.class);
         Date inviteSent = invite.getDate("date");
-        if(new Date().getTime() - inviteSent.getTime() <= TimeUnit.SECONDS.toMillis(2000)){
+        if (new Date().getTime() - inviteSent.getTime() <= TimeUnit.SECONDS.toMillis(2000)) {
             String enclaveString = invite.getString("enclave");
             return UUID.fromString(enclaveString);
-        }else{
+        } else {
             return null;
         }
     }
 
     /**
      * Get the player's UUID
+     *
      * @return UUID
      */
     public UUID getPlayerUUID() {
         return playerUUID;
+    }
+
+    /**
+     * The time since the region was claimed.
+     */
+    public String originDate() {
+        return this.player.getDate("date").toString();
     }
 
 }

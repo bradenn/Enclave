@@ -9,12 +9,10 @@ import net.md_5.bungee.api.ChatColor;
 import org.bson.BsonArray;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class EnclaveModel {
@@ -58,7 +56,8 @@ public class EnclaveModel {
                 .append("color", "#CCCCCC")
                 .append("tags", new BsonArray())
                 .append("owner", playerUUID.toString())
-                .append("members", members);
+                .append("members", members)
+                .append("date", new Date());
         // Insert the document into the database.
         collection.insertOne(enclaveDoc);
 
@@ -185,6 +184,17 @@ public class EnclaveModel {
     }
 
     /**
+     * Add a member to the enclave. You must also assign the player's enclave from the Player Model.
+     */
+    public List<String> listMembers() {
+        List<String> list = new ArrayList<>();
+        enclave.getList("members", String.class).forEach(member -> {
+            list.add(Bukkit.getOfflinePlayer(UUID.fromString(member)).getName());
+        });
+        return list;
+    }
+
+    /**
      * Set the name of the enclave (overwrite)
      */
     public void setName(String name) {
@@ -286,5 +296,12 @@ public class EnclaveModel {
             // Return true to signify that the tag has been disabled.
             return true;
         }
+    }
+
+    /**
+     * The time since the region was claimed.
+     */
+    public String originDate() {
+        return this.enclave.getDate("date").toString();
     }
 }

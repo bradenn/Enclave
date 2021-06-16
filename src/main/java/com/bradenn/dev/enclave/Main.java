@@ -1,5 +1,6 @@
 package com.bradenn.dev.enclave;
 
+import com.bradenn.dev.enclave.commands.AdminCommand;
 import com.bradenn.dev.enclave.commands.EnclaveCommand;
 import com.bradenn.dev.enclave.events.InteractionEvents;
 import com.bradenn.dev.enclave.events.PlayerEvents;
@@ -25,6 +26,9 @@ public class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("enclave")).setExecutor(new EnclaveCommand());
         Objects.requireNonNull(getCommand("enclave")).setTabCompleter(new EnclaveCommand());
 
+        Objects.requireNonNull(getCommand("enclaveadmin")).setExecutor(new AdminCommand());
+        Objects.requireNonNull(getCommand("enclaveadmin")).setTabCompleter(new AdminCommand());
+
         List<Listener> listeners = new ArrayList<>();
         listeners.add(new PlayerEvents());
         listeners.add(new InteractionEvents());
@@ -39,6 +43,8 @@ public class Main extends JavaPlugin {
         }catch(IllegalArgumentException | MongoSocketException e){
             getServer().getLogger().log(Level.SEVERE, "Database connection failed.");
         }
+
+        Runtime.run();
     }
 
     @Override

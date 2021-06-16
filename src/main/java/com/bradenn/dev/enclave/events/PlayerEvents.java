@@ -1,5 +1,6 @@
 package com.bradenn.dev.enclave.events;
 
+import com.bradenn.dev.enclave.messages.MessageUtils;
 import com.bradenn.dev.enclave.models.PlayerModel;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.event.EventHandler;
@@ -24,7 +25,8 @@ public class PlayerEvents implements Listener {
     public void onChat(AsyncPlayerChatEvent e) {
         PlayerModel pm = new PlayerModel(e.getPlayer().getUniqueId());
         if (pm.getEnclave().isValid()) {
-            e.setFormat(pm.getEnclave().getDisplayName() + " §7%s§6:" + ChatColor.of("#EBF3FF") + " %s");
+            e.setFormat(pm.getEnclave().getDisplayName() + " §7%s§7:" + ChatColor.of("#EBF3FF") + " %s");
+            e.setMessage(MessageUtils.format(e.getMessage()));
         } else {
             e.getPlayer().sendMessage("You have no enclave");
         }
