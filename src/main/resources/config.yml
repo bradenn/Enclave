@@ -1,8 +1,6 @@
 quotas:
   default:
-    chunks:
-      private: 16
-      public: 2
+    chunks: 16
     members: -1
     warps: 2
 worlds:

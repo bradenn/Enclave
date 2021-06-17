@@ -21,6 +21,8 @@ public class EnclaveModel {
     private final Document enclave;
 
     private final MongoCollection<Document> collection = Database.getCollection("enclaves");
+    private final MongoCollection<Document> regions = Database.getCollection("regions");
+    private final MongoCollection<Document> players = Database.getCollection("players");
 
     /**
      * Get an enclave's database document from it's UUID.
@@ -68,6 +70,7 @@ public class EnclaveModel {
 
     /**
      * Get the query document for the current enclave.
+     *
      * @return Document Update document
      */
     private Document queryDocument() {
@@ -77,9 +80,10 @@ public class EnclaveModel {
 
     /**
      * Execute bson on the current enclave.
+     *
      * @param bson Update document
      */
-    private void updateEnclave(Bson bson){
+    private void updateEnclave(Bson bson) {
         this.collection.findOneAndUpdate(queryDocument(), bson);
     }
 
@@ -139,6 +143,7 @@ public class EnclaveModel {
 
     /**
      * Get the enclave's UUID
+     *
      * @return UUID
      */
     public UUID getUUID() {
@@ -147,6 +152,7 @@ public class EnclaveModel {
 
     /**
      * Set the owner of the enclave.
+     *
      * @param playerUUID Player UUID
      */
     public void setOwner(UUID playerUUID) {
@@ -155,6 +161,7 @@ public class EnclaveModel {
 
     /**
      * Get the UUID of the player whom owns the enclave
+     *
      * @return UUID
      */
     public UUID getOwner() {
@@ -163,6 +170,7 @@ public class EnclaveModel {
 
     /**
      * Determine whether the enclave has a member with a UUID.
+     *
      * @return UUID
      */
     public boolean hasMember(UUID uuid) {
@@ -199,6 +207,26 @@ public class EnclaveModel {
      */
     public void setName(String name) {
         updateEnclave(Updates.set("name", name));
+    }
+
+    /**
+     * Change the chunk quota for the enclave.
+     */
+    public void setChunkQuota(int quota) {
+        updateEnclave(Updates.set("quotas.chunks", quota));
+    }
+
+    /**
+     * Set the name of the enclave (overwrite)
+     */
+    public int getChunkQuota() {
+        Document doc = (Document) enclave.get("quotas");
+        if (doc != null) {
+            Object quota = doc.get("chunks");
+                return quota == null ? 0 : (int) quota;
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -246,6 +274,7 @@ public class EnclaveModel {
 
     /**
      * Get the home location of the enclave.
+     *
      * @return Location Enclave Home, returns null if no home is set.
      */
     @SuppressWarnings("unchecked")
@@ -253,11 +282,45 @@ public class EnclaveModel {
         // Get the home location from the enclave document.
         Map<String, Object> location = (Map<String, Object>) enclave.get("home");
         // Return the deserialized location, or null if there is no home set.
-        return (location != null)?Location.deserialize(location):null;
+        return (location != null) ? Location.deserialize(location) : null;
+    }
+
+    /**
+     * Get the number of chunks claimed by this enclave.
+     *
+     * @return int number of chunks.
+     */
+    public int getChunkCount() {
+        return (int) regions.countDocuments(new Document("enclave", uuid.toString()));
+    }
+
+    /**
+     * Get the number of chunks claimed by this enclave.
+     *
+     * @return int number of chunks.
+     */
+    public List<UUID> getMembers() {
+        FindIterable<Document> playersCollection = players.find(new Document("enclave", uuid));
+        List<UUID> members = new ArrayList<>();
+        for (Document document : playersCollection) {
+            UUID uuid = UUID.fromString(document.get("uuid", String.class));
+            members.add(uuid);
+        }
+        return members;
+    }
+
+    /**
+     * Get the number of chunks claimed by this enclave.
+     *
+     * @return int number of chunks.
+     */
+    public int getMemberCount() {
+        return getMembers().size();
     }
 
     /**
      * Get all tag attributes currently disabled in this enclave.
+     *
      * @return List<String> List of disabled properties
      */
     public List<String> getTags() {
@@ -266,6 +329,7 @@ public class EnclaveModel {
 
     /**
      * Check if a tag attribute has been disabled in this enclave.
+     *
      * @return boolean If true, the tag attribute is disabled.
      */
     public boolean checkTag(Tag tag) {
@@ -276,6 +340,7 @@ public class EnclaveModel {
     /**
      * Toggle the given tag on or off depending on it's previous state.
      * All tags in the list are considered "disabled", all are "enabled" by default.
+     *
      * @param tag The EnclaveTag to toggle
      * @return boolean
      */
