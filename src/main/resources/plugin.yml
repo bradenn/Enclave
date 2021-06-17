@@ -1,10 +1,11 @@
 name: Enclave
 main: com.bradenn.dev.enclave.Main
-version: 1.5.1
+version: 1.5.2
 author: bradencn
 api-version: 1.17
 website: bradenn.com
 description: Own land and have a good time.
+softdepend: ["PlaceholderAPI"]
 commands:
   enclave:
     description: Interact with enclaves.
@@ -16,7 +17,9 @@ commands:
     aliases: ea
     usage: /ea [command] [args]
 permissions:
-  enclave.*:
-    default: false
+  enclave.command:
+    description: Basic access to all non-admin enclave commands.
+    default: true
   enclave.admin:
+    description: Access to overriding all enclave commands and permissions.
     default: op
