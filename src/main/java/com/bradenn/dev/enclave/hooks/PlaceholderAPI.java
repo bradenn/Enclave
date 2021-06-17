@@ -1,10 +1,10 @@
 package com.bradenn.dev.enclave.hooks;
 
 import com.bradenn.dev.enclave.Main;
+import com.bradenn.dev.enclave.managers.EnclaveManager;
 import com.bradenn.dev.enclave.models.EnclaveModel;
 import com.bradenn.dev.enclave.models.PlayerModel;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
 public class PlaceholderAPI extends PlaceholderExpansion {
@@ -46,14 +46,21 @@ public class PlaceholderAPI extends PlaceholderExpansion {
     if (player == null) {
       return "";
     }
-    if (identifier.equals("name")) {
+
+    if (new EnclaveManager(player).isValid()) {
       PlayerModel playerModel = new PlayerModel(player.getUniqueId());
-      if (playerModel != null) {
-        EnclaveModel enclaveModel = playerModel.getEnclave();
-        return ChatColor.of(enclaveModel.getColor()) + enclaveModel.getName();
+      EnclaveModel enclaveModel = playerModel.getEnclave();
+
+      if (identifier.startsWith("name")) {
+        return enclaveModel.getName();
       }
-      return "";
+      if (identifier.equals("displayname")) {
+        return enclaveModel.getDisplayName();
+      }
+      if (identifier.startsWith("member_count")) {
+        return String.valueOf(enclaveModel.listMembers().size());
+      }
     }
-    return null;
+    return "";
   }
 }

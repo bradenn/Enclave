@@ -8,17 +8,16 @@ import com.bradenn.dev.enclave.models.PlayerModel;
 import com.bradenn.dev.enclave.models.RegionModel;
 import com.bradenn.dev.enclave.models.Tag;
 import com.bradenn.dev.enclave.renderers.ParticleRenderer;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 public class EnclaveManager {
 
@@ -80,10 +79,10 @@ public class EnclaveManager {
 
     public boolean isValid() {
         if (enclave != null) {
-            return enclave.isValid();
-        } else {
-            return false;
+            return true;
         }
+
+        return false;
     }
 
     /**
