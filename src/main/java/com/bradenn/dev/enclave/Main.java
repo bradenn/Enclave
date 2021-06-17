@@ -5,15 +5,16 @@ import com.bradenn.dev.enclave.commands.EnclaveCommand;
 import com.bradenn.dev.enclave.events.InteractionEvents;
 import com.bradenn.dev.enclave.events.PlayerEvents;
 import com.bradenn.dev.enclave.events.WorldEvents;
+import com.bradenn.dev.enclave.hooks.PlaceholderAPI;
 import com.mongodb.MongoSocketException;
-import org.bukkit.event.Listener;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
+import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin {
 
@@ -37,14 +38,22 @@ public class Main extends JavaPlugin {
 
         this.saveDefaultConfig();
 
-
         try {
             Database.connect();
-        }catch(IllegalArgumentException | MongoSocketException e){
+        } catch (IllegalArgumentException | MongoSocketException e) {
             getServer().getLogger().log(Level.SEVERE, "Database connection failed.");
         }
 
         Runtime.run();
+        loadHooks();
+    }
+
+    private void loadHooks() {
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new PlaceholderAPI(this).register();
+        } else {
+            getServer().getLogger().log(Level.WARNING, "Could not find PlaceholderAPI.");
+        }
     }
 
     @Override
