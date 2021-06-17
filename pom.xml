@@ -31,7 +31,7 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <finalName>${project.artifactId}-${project.version}-SHADE</finalName>
-                            <outputDirectory>${dir}</outputDirectory>
+                            <outputDirectory>${basedir}</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -46,13 +46,6 @@
         </resources>
 
     </build>
-
-    <repositories>
-        <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
@@ -73,6 +66,23 @@
             <version>19.0.0</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <artifactId>placeholderapi</artifactId>
+            <groupId>me.clip</groupId>
+            <scope>provided</scope>
+            <version>2.10.9</version>
+        </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>placeholderapi</id>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
+    </repositories>
 
 </project>
