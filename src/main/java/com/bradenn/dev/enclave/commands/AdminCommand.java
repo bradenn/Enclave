@@ -32,14 +32,13 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                 case 1:
                     switch (args[0].toLowerCase()) {
                         case "wipe":
-                            // /ea wipe
-                            // Wipe region data for a current chunk
                             adminManager.wipeChunk();
                             break;
                         case "info":
-                            // /ea info
-                            // Get all data for a current chunk
                             adminManager.getInfo();
+                            break;
+                        case "border":
+                            adminManager.showBorder();
                             break;
                         default:
                             adminManager.sendHelp();
@@ -49,19 +48,8 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                 case 2:
                     switch (args[0].toLowerCase()) {
                         case "disband":
-                            String aa = "⊹ ⊺ ⊻ ⊼ ⊽ ⊾ ⊿ ⋀ ⋁ ⋂ ⋃ ⋄ ⋅ ⋆ ⋇ ⋮ ⋯ ⋰ ⋱ ⌇ ⌈ ⌉ ⌊ ⌋";
-                            String[] s1 = aa.split(" ");
-
-                            for (String s2 : s1) {
-                                player.sendMessage(s2+s2);
-                            }
                             // /ea disband [player]
                             // Force disband an enclave
-                            break;
-                        case "border":
-                            adminManager.showBorder();
-                            // /ea kick [player]
-                            // Kick player from all enclaves
                             break;
                         default:
                             adminManager.sendHelp();
@@ -88,7 +76,6 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                     break;
             }
         }
-
         return true;
     }
 

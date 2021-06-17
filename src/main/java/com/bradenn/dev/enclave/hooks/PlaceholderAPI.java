@@ -1,66 +1,59 @@
 package com.bradenn.dev.enclave.hooks;
 
 import com.bradenn.dev.enclave.Main;
-import com.bradenn.dev.enclave.managers.EnclaveManager;
 import com.bradenn.dev.enclave.models.EnclaveModel;
 import com.bradenn.dev.enclave.models.PlayerModel;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class PlaceholderAPI extends PlaceholderExpansion {
 
-  private final Main plugin;
+    private final Main plugin;
 
-  public PlaceholderAPI(Main plugin) {
-    this.plugin = plugin;
-  }
-
-  @Override
-  public boolean persist() {
-    return true;
-  }
-
-  @Override
-  public boolean canRegister() {
-    return true;
-  }
-
-  @Override
-  public String getAuthor() {
-    return plugin.getDescription().getAuthors().toString();
-  }
-
-  @Override
-  public String getIdentifier() {
-    return "enclave";
-  }
-
-  @Override
-  public String getVersion() {
-    return plugin.getDescription().getVersion();
-  }
-
-  @Override
-  public String onPlaceholderRequest(Player player, String identifier) {
-
-    if (player == null) {
-      return "";
+    public PlaceholderAPI(Main plugin) {
+        this.plugin = plugin;
     }
 
-    if (new EnclaveManager(player).isValid()) {
-      PlayerModel playerModel = new PlayerModel(player.getUniqueId());
-      EnclaveModel enclaveModel = playerModel.getEnclave();
-
-      if (identifier.startsWith("name")) {
-        return enclaveModel.getName();
-      }
-      if (identifier.equals("displayname")) {
-        return enclaveModel.getDisplayName();
-      }
-      if (identifier.startsWith("member_count")) {
-        return String.valueOf(enclaveModel.listMembers().size());
-      }
+    @Override
+    public boolean persist() {
+        return true;
     }
-    return "";
-  }
+
+    @Override
+    public boolean canRegister() {
+        return true;
+    }
+
+    @Override
+    public String getAuthor() {
+        return plugin.getDescription().getAuthors().toString();
+    }
+
+    @Override
+    public String getIdentifier() {
+        return "enclave";
+    }
+
+    @Override
+    public String getVersion() {
+        return plugin.getDescription().getVersion();
+    }
+
+    @Override
+    public String onPlaceholderRequest(Player player, @NotNull String identifier) {
+
+        if (player == null) return "";
+
+        if (identifier.equals("name")) {
+            PlayerModel playerModel = new PlayerModel(player.getUniqueId());
+            EnclaveModel enclaveModel = playerModel.getEnclave();
+            if (enclaveModel != null) {
+                return enclaveModel.getDisplayName();
+            }
+            return "";
+        }
+
+        return null;
+    }
 }

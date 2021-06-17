@@ -58,6 +58,7 @@ public class EnclaveManager {
         commandInfo.addLine("unclaim", "Unclaim regions for your enclave");
         commandInfo.addLine("disband", "Disband your enclave");
         commandInfo.addLine("info", "Get info about a region");
+        commandInfo.addLine("help", "Show this help page");
         player.sendMessage(commandInfo.getMessage());
     }
 
@@ -69,6 +70,7 @@ public class EnclaveManager {
         commandInfo.addLine("create", "[name] Create an enclave");
         commandInfo.addLine("map", "Get a map of nearby enclaves");
         commandInfo.addLine("here", "Get info about a region");
+        commandInfo.addLine("help", "Show this help page");
         player.sendMessage(commandInfo.getMessage());
     }
 

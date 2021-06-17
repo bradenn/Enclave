@@ -8,6 +8,9 @@ public enum Response {
     ENCLAVE_CREATED("The enclave %s has been created."),
     E_INVALID_ENCLAVE_NAME("Invalid enclave name.", true),
 
+    SHOW_BORDER_ENABLED("Enclave chunk borders have been enabled."),
+    SHOW_BORDER_DISABLED("Enclave chunk borders have been disabled."),
+
     ENCLAVE_DISBANDED("The enclave %s has been disbanded."),
 
     TAG_ENABLED("The attribute %s has been enabled."),

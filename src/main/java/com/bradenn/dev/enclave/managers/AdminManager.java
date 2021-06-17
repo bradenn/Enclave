@@ -2,6 +2,8 @@ package com.bradenn.dev.enclave.managers;
 
 import com.bradenn.dev.enclave.Runtime;
 import com.bradenn.dev.enclave.messages.MessageBlock;
+import com.bradenn.dev.enclave.messages.MessageUtils;
+import com.bradenn.dev.enclave.messages.Response;
 import com.bradenn.dev.enclave.models.EnclaveModel;
 import com.bradenn.dev.enclave.models.RegionModel;
 import org.bukkit.Bukkit;
@@ -25,7 +27,9 @@ public class AdminManager {
         adminHelp.addLine("disband", "[player] Disband enclave using a member's username.");
         adminHelp.addLine("kick", "[player] Kick a player from their enclave.");
         adminHelp.addLine("wipe", "Remove region data for current chunk.");
+        adminHelp.addLine("border", "Toggle showing particle borders.");
         adminHelp.addLine("info", "Get info about a region");
+        adminHelp.addLine("help", "Show this help page");
         player.sendMessage(adminHelp.getMessage());
     }
 
@@ -36,8 +40,10 @@ public class AdminManager {
     public void showBorder() {
         if (Runtime.chunkRenderers.contains(player)) {
             Runtime.chunkRenderers.remove(player);
+            MessageUtils.send(player, Response.SHOW_BORDER_DISABLED);
         } else {
             Runtime.chunkRenderers.add(player);
+            MessageUtils.send(player, Response.SHOW_BORDER_ENABLED);
         }
     }
 
