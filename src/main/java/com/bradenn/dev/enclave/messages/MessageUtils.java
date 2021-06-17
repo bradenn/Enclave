@@ -27,7 +27,7 @@ public class MessageUtils {
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(MessageUtils.format(message)));
     }
 
-    public static void send(Player player, Response response, String... args) {
+    public static void send(Player player, Response response, Object... args) {
         String prepared = String.format(response.getMessage(), args);
         String prefix = response.isError() ? getErrorPrefix() : getInfoPrefix();
         player.sendMessage(prefix + format(prepared));

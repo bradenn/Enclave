@@ -12,6 +12,7 @@ public enum Response {
 
     TAG_ENABLED("The attribute %s has been enabled."),
     TAG_DISABLED("The attribute %s has been disabled."),
+    E_INVALID_TAG("Invalid tag provided.", true),
 
     COLOR_CHANGED("The enclave color has been changed to %s."),
     E_INVALID_COLOR("Invalid color provided.", true),
@@ -34,8 +35,9 @@ public enum Response {
     E_ALREADY_IN_ENCLAVE("This player is already in an enclave.", true),
 
     /* Region Messages */
-    CHUNK_CLAIMED("Chunk claimed."),
+    CHUNK_CLAIMED("Chunk claimed. (%d/%d)"),
     CHUNK_UNCLAIMED("This chunk has been unclaimed."),
+    E_CHUNK_QUOTA_EXCEEDED("Cannot claim chunk. Your enclave has exceeded its chunk claim quota. (%d/%d)", true),
 
     E_CLAIMED("This chunk is claimed.", true),
     E_CHUNK_CLAIMED("Chunk has already been claimed.", true),
