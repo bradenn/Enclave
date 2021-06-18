@@ -31,6 +31,7 @@ public class AdminManager {
         adminHelp.addLine("disband", "[player] Disband a user's enclave.");
         adminHelp.addLine("kick", "[player] Kick a player from their enclave.");
         adminHelp.addLine("wipe", "Remove region data for current chunk.");
+        adminHelp.addLine("cleanup", "Reset all particle effects.");
         adminHelp.addLine("border", "Toggle showing particle borders.");
         adminHelp.addLine("identifier", "Toggle showing particle identifier.");
         adminHelp.addLine("version", "Get the plugin version.");
@@ -44,27 +45,28 @@ public class AdminManager {
     }
 
     public void showBorder() {
-        if (Runtime.chunkBorders.contains(player)) {
-            Runtime.chunkBorders.remove(player);
-            MessageUtils.send(player, Response.SHOW_BORDER_DISABLED);
-        } else {
-            Runtime.chunkBorders.add(player);
+        if (Main.runtime.togglePlayerTask(player, Runtime.PlayerTask.SHOW_PARTICLE_BORDER)) {
             MessageUtils.send(player, Response.SHOW_BORDER_ENABLED);
+        } else {
+            MessageUtils.send(player, Response.SHOW_BORDER_DISABLED);
         }
     }
 
     public void showIdentifier() {
-        if (Runtime.chunkIdentifiers.contains(player)) {
-            Runtime.chunkIdentifiers.remove(player);
-            MessageUtils.send(player, Response.SHOW_BORDER_DISABLED);
-        } else {
-            Runtime.chunkIdentifiers.add(player);
+        if (Main.runtime.togglePlayerTask(player, Runtime.PlayerTask.SHOW_PARTICLE_IDENTIFIER)) {
             MessageUtils.send(player, Response.SHOW_BORDER_ENABLED);
+        } else {
+            MessageUtils.send(player, Response.SHOW_BORDER_DISABLED);
         }
     }
 
     public void showVersion() {
         MessageUtils.send(player, Response.SEND_VERSION, Main.plugin.getDescription().getVersion());
+    }
+
+    public void cleanupRuntime() {
+        int total = Main.runtime.clear();
+        MessageUtils.send(player, Response.SEND_CLEANUP, total);
     }
 
     public void getInfo() {
@@ -93,6 +95,7 @@ public class AdminManager {
 
     /**
      * Disband the enclave belonging to a user.
+     *
      * @param playerName The player's username
      */
     public void disbandEnclave(String playerName) {
@@ -113,6 +116,7 @@ public class AdminManager {
 
     /**
      * Kick a player from their enclave.
+     *
      * @param playerName The player's username
      */
     public void kickPlayer(String playerName) {
@@ -150,4 +154,6 @@ public class AdminManager {
     private Player parsePlayer(String name) {
         return Bukkit.getPlayer(name);
     }
+
+
 }

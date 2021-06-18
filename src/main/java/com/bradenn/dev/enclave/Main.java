@@ -22,15 +22,16 @@ import java.util.logging.Level;
 public class Main extends JavaPlugin {
 
     public static Plugin plugin;
+    public static Runtime runtime;
 
     @Override
     public void onEnable() {
         init();
-        Runtime.run();
     }
 
     private void init() {
         plugin = this;
+        runtime = new Runtime(plugin);
 
         registerListeners();
 
@@ -41,6 +42,7 @@ public class Main extends JavaPlugin {
 
         connectDatabase();
         loadHooks();
+        runtime.run();
     }
 
     private void registerListeners() {

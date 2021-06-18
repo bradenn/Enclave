@@ -6,6 +6,7 @@ public enum Response {
     /* Enclave Messages */
     ENCLAVE_NAME_CHANGED("Enclave name has been changed to %s."),
     SEND_VERSION("Enclave is currently running version %s."),
+    SEND_CLEANUP("Runtime has been dumped. %d elements cleared."),
 
     PLAYER_KICKED("%s has been kicked from the enclave %s."),
 
