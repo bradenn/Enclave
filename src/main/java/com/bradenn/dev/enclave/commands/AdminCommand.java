@@ -44,6 +44,9 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                         case "version":
                             adminManager.showVersion();
                             break;
+                        case "cleanup":
+                            adminManager.cleanupRuntime();
+                            break;
                         default:
                             adminManager.sendHelp();
                             break;
@@ -96,6 +99,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
         commands.put("info", new ArrayList<>());
         commands.put("border", new ArrayList<>());
         commands.put("identifier", new ArrayList<>());
+        commands.put("cleanup", new ArrayList<>());
 
         commands.put("disband", null);
         commands.put("kick", null);

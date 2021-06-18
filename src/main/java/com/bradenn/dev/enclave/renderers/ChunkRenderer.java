@@ -7,7 +7,7 @@ public class ChunkRenderer {
 
     public enum ChunkEffect {
         OUTLINE,
-        IDENTIFIER
+        BORDER
     }
 
     private final Player target;
@@ -19,14 +19,14 @@ public class ChunkRenderer {
     }
 
     public void render() {
-        for (int i = -2; i <= 2; i++) {
-            for (int j = -2; j <= 2; j++) {
-                Chunk chunk = target.getLocation().add(16 * i, 0, 16 * j).getChunk();
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                Chunk chunk = target.getLocation().add(i << 4, 0, j << 4).getChunk();
                 switch (effect) {
                     case OUTLINE:
                         ParticleUtils.outlineChunk(chunk);
                         break;
-                    case IDENTIFIER:
+                    case BORDER:
                         ParticleUtils.identifyChunk(chunk);
                         break;
                     default:

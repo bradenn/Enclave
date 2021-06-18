@@ -23,15 +23,15 @@ public class ParticleUtils {
         ParticleDust yMarkerDust = new ParticleDust(ChatColor.of("#0a84ff"));
         ParticleDust zMarkerDust = new ParticleDust(ChatColor.of("#8fd158"));
 
-        Location textLocation = new Location(world, cx + 1, cy + 1, cz + 1);
+        Location chunkTextLocation = new Location(world, cx + 1, cy + 1, cz + 1);
         String chunkString = String.format("[%d,%d]", chunk.getX(), chunk.getZ());
-        ParticleUtils.drawText(textLocation, chunkString);
+        ParticleUtils.drawText(chunkTextLocation, chunkString);
 
-        for (double i = 0; i < 16; i += 1) {
-            Location nexus = new Location(world, cx, 0, cz);
-            xMarkerDust.spawn(nexus.clone().add(i / 2, world.getHighestBlockYAt(nexus.getBlockX(), nexus.getBlockZ()) + 1, 0));
-            yMarkerDust.spawn(nexus.clone().add(0, world.getHighestBlockYAt(nexus.getBlockX(), nexus.getBlockZ()) + 1 + i / 2, 0));
-            zMarkerDust.spawn(nexus.clone().add(0, world.getHighestBlockYAt(nexus.getBlockX(), nexus.getBlockZ()) + 1, i / 2));
+        for (double i = 0; i < 8; i += 1) {
+            Location nexus = new Location(world, cx + 0.5, 0, cz + 0.5);
+            xMarkerDust.spawn(nexus.clone().add(i, world.getHighestBlockYAt(nexus.getBlockX(), nexus.getBlockZ()) + 1, 0));
+            yMarkerDust.spawn(nexus.clone().add(0, world.getHighestBlockYAt(nexus.getBlockX(), nexus.getBlockZ()) + 1 + i, 0));
+            zMarkerDust.spawn(nexus.clone().add(0, world.getHighestBlockYAt(nexus.getBlockX(), nexus.getBlockZ()) + 1, i));
         }
     }
 

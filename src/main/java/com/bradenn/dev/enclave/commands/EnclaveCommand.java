@@ -1,7 +1,6 @@
 package com.bradenn.dev.enclave.commands;
 
 import com.bradenn.dev.enclave.managers.EnclaveManager;
-import com.bradenn.dev.enclave.managers.RegionManager;
 import com.bradenn.dev.enclave.models.Tag;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -32,14 +31,14 @@ public class EnclaveCommand implements CommandExecutor, TabCompleter {
                 switch (args.length) {
                     case 1:
                         switch (args[0].toLowerCase()) {
-                            case "map":
-                                RegionManager.showBorders(player);
-                                break;
                             case "here":
                                 enclaveManager.getInfo();
                                 break;
                             case "join":
                                 enclaveManager.joinEnclave();
+                                break;
+                            case "borders":
+                                enclaveManager.showBorders();
                                 break;
                             default:
                                 enclaveManager.sendNoobHelp();
@@ -72,9 +71,6 @@ public class EnclaveCommand implements CommandExecutor, TabCompleter {
                                 break;
                             case "home":
                                 enclaveManager.goHome();
-                                break;
-                            case "map":
-                                RegionManager.showBorders(player);
                                 break;
                             case "unclaim":
                                 enclaveManager.unclaimRegion();
@@ -138,7 +134,7 @@ public class EnclaveCommand implements CommandExecutor, TabCompleter {
         commands.put("unclaim", new ArrayList<>());
         commands.put("invite", null);
         commands.put("rename", new ArrayList<>());
-        commands.put("map", new ArrayList<>());
+        commands.put("borders", new ArrayList<>());
         commands.put("here", new ArrayList<>());
         commands.put("disband", new ArrayList<>());
         commands.put("create", null);

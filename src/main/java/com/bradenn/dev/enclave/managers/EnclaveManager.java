@@ -414,4 +414,7 @@ public class EnclaveManager {
         for (T t : object) items.add(t.name());
         return items;
     }
+
+    public void showBorders() {
+    }
 }
