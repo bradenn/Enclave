@@ -3,8 +3,6 @@ package com.bradenn.dev.enclave.commands;
 import com.bradenn.dev.enclave.managers.AdminManager;
 import com.bradenn.dev.enclave.messages.MessageUtils;
 import com.bradenn.dev.enclave.messages.Response;
-import com.bradenn.dev.enclave.models.Tag;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -40,6 +38,12 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                         case "border":
                             adminManager.showBorder();
                             break;
+                        case "identifier":
+                            adminManager.showIdentifier();
+                            break;
+                        case "version":
+                            adminManager.showVersion();
+                            break;
                         default:
                             adminManager.sendHelp();
                             break;
@@ -48,8 +52,10 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                 case 2:
                     switch (args[0].toLowerCase()) {
                         case "disband":
-                            // /ea disband [player]
-                            // Force disband an enclave
+                            adminManager.disbandEnclave(args[1]);
+                            break;
+                        case "kick":
+                            adminManager.kickPlayer(args[1]);
                             break;
                         default:
                             adminManager.sendHelp();
@@ -86,17 +92,13 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
 
         Map<String, List<String>> commands = new HashMap<>();
 
-        commands.put("claim", new ArrayList<>());
-        commands.put("unclaim", new ArrayList<>());
-        commands.put("invite", null);
-        commands.put("map", new ArrayList<>());
-        commands.put("here", new ArrayList<>());
-        commands.put("disband", new ArrayList<>());
-        commands.put("create", null);
-        commands.put("tags", null);
+        commands.put("wipe", new ArrayList<>());
+        commands.put("info", new ArrayList<>());
+        commands.put("border", new ArrayList<>());
+        commands.put("identifier", new ArrayList<>());
 
-        commands.put("color", enumList(ChatColor.values()));
-        commands.put("tag", enumList(Tag.values()));
+        commands.put("disband", null);
+        commands.put("kick", null);
 
         switch (args.length) {
             case 1:

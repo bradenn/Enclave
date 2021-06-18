@@ -2,8 +2,12 @@ package com.bradenn.dev.enclave.messages;
 
 public enum Response {
 
+
     /* Enclave Messages */
     ENCLAVE_NAME_CHANGED("Enclave name has been changed to %s."),
+    SEND_VERSION("Enclave is currently running version %s."),
+
+    PLAYER_KICKED("%s has been kicked from the enclave %s."),
 
     ENCLAVE_CREATED("The enclave %s has been created."),
     E_INVALID_ENCLAVE_NAME("Invalid enclave name.", true),
@@ -49,10 +53,12 @@ public enum Response {
     /* Generic errors */
     E_ENCLAVE("You are already a member of an enclave.", true),
     E_NO_ENCLAVE("You are not a member of any enclave.", true),
+    E_PLAYER_NO_ENCLAVE("This player is not a member of any enclave.", true),
 
     E_INVALID_PLAYER("Invalid player provided.", true),
     E_PLAYER_OFFLINE("The player provided is currently offline.", true),
 
+    E_KICK_OWNER("This player is the owner of the enclave. You must disband their enclave first.", true),
     E_INSUFFICIENT_PERMISSION("You do not have permission to do that.", true),
     E_INSUFFICIENT_CLOUT("You must be the owner of the enclave to do that.", true),
     ;
