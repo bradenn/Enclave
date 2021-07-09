@@ -72,6 +72,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                             // Merge two enclaves
                             break;
                         case "color":
+                            adminManager.setColor(args[1], args[2]);
                             // /ea color [player] [color]
                             // Change the color of an enclave
                             break;

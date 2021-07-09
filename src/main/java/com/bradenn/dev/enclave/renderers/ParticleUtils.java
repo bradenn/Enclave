@@ -14,23 +14,69 @@ import java.util.Objects;
 
 public class ParticleUtils {
 
-    public static void chunkWall(Chunk chunk, Location playerLocation, int face) {
-        Location location = new Location(chunk.getWorld(), chunk.getX() * 16, 0, chunk.getZ() * 16);
-        location.setY(chunk.getWorld().getHighestBlockYAt(chunk.getX() * 16, chunk.getZ() * 16));
+    public static void chunkClaim(Chunk chunk, Location location) {
         ParticleDust xMarkerDust = new ParticleDust(ChatColor.of("#0a84ff"));
         ParticleDust yMarkerDust = new ParticleDust(ChatColor.of("#64d2ff"));
-        if (playerLocation.getY() - location.getY() >= 2) {
-            location.setY(playerLocation.getY() - 3);
-        }
+
+        int chunkX = chunk.getX() * 16;
+        int chunkZ = chunk.getZ() * 16;
+
         new BukkitRunnable() {
-            double j = 0;
-            int itr = 0;
+            double scale = 0;
 
             @Override
             public void run() {
+                for (double i = 0; i <= 16; i += 0.5) {
+                    double circle = (Math.PI * 2)/16;
+                    double x = Math.cos(circle * i) * scale;
+                    double y = Math.sin(circle * i) * scale;
+                    Location point = location.clone().add(x, 0.25, y);
+
+                    if(point.getX() <= chunkX || point.getX() >= chunkX + 16) continue;
+                    if(point.getZ() <= chunkZ || point.getZ() >= chunkZ + 16) continue;
+
+
+                    if (scale % 4 == 0) {
+                        xMarkerDust.spawn(point);
+                    } else {
+                        yMarkerDust.spawn(point);
+                    }
+                }
+                scale += 1;
+                if (scale >= 8) {
+                    animateWall(chunk, location.getY(), 0);
+                    animateWall(chunk, location.getY(), 1);
+                    animateWall(chunk, location.getY(), 2);
+                    animateWall(chunk, location.getY(), 3);
+                    cancel();
+                }
+            }
+
+        }.runTaskTimer(Main.plugin, 0, 1/2);
+
+    }
+
+    public static void animateWall(Chunk chunk, double y, int face) {
+        Location location = new Location(chunk.getWorld(), chunk.getX() * 16, 0, chunk.getZ() * 16);
+        location.setY(chunk.getWorld().getHighestBlockYAt(chunk.getX() * 16, chunk.getZ() * 16));
+
+        ParticleDust xMarkerDust = new ParticleDust(ChatColor.of("#0a84ff"));
+        ParticleDust yMarkerDust = new ParticleDust(ChatColor.of("#64d2ff"));
+
+        if(y >= location.getY()){
+            location.setY(y - 3);
+        }
+
+        new BukkitRunnable() {
+            double scanLine = 0;
+
+            @Override
+            public void run() {
+
                 for (double i = 0; i < 16; i += 0.5) {
+                    double y = scanLine + Math.abs(Math.sin((2 * Math.PI / 16) * i + i) / 4);
+
                     Location point = location;
-                    double y = j + Math.abs(Math.sin((2 * Math.PI / 16) * i + i) / 4);
                     switch (face) {
                         case 0: // East
                             point = location.clone().add(0, y, i);
@@ -45,27 +91,37 @@ public class ParticleUtils {
                             point = location.clone().add(-i + 16, y, 16);
                             break;
                     }
-                    if (j % 2 == 0) {
+
+                    if (scanLine % 2 == 0) {
                         xMarkerDust.spawn(point);
                     } else {
                         yMarkerDust.spawn(point);
                     }
                 }
 
-                j += 0.5;
-                if (j >= 8) {
-                    j = 0;
-                    itr++;
-                    if (itr >= 2) {
-                        cancel();
-                    }
+                scanLine += 0.5;
+                if (scanLine >= 8) {
+                    scanLine = 0;
+                    cancel();
                 }
-
             }
-
         }.runTaskTimer(Main.plugin, 0, 1);
 
+    }
+    public static void chunkWall(Chunk chunk, Location location, int face) {
+        new BukkitRunnable() {
+            int itr = 0;
 
+            @Override
+            public void run() {
+                animateWall(chunk, location.getY(), face);
+
+                itr++;
+                if (itr >= 2) {
+                    cancel();
+                }
+            }
+        }.runTaskTimer(Main.plugin, 0, 1);
     }
 
     public static void playerWall(Chunk chunk, Location location, int face) {
@@ -77,14 +133,15 @@ public class ParticleUtils {
 
             @Override
             public void run() {
-
+                int chunkX = chunk.getX() * 16;
+                int chunkZ = chunk.getZ() * 16;
                 for (double i = 0; i <= 8; i += 0.5) {
-                    for (double j = 1.2; j <= 2; j += 0.2) {
+                    for (double radius = 1.2; radius <= 2; radius += 0.4) {
+                        double pi2 = Math.PI * 2;
+                        double x = Math.cos((pi2 / 8) * i) * radius * 0.75;
+                        double y = Math.sin((pi2 / 8) * i) * radius + 1;
 
-                        double x = Math.cos(((Math.PI * 2) / 8) * i) * j * 0.75,
-                                y = Math.sin(((Math.PI * 2) / 8) * i) * j + 1;
-
-                        double indent = Math.sin(((Math.PI * 2) / 8) * j + Math.PI / 2) / scale + 0.25;
+                        double indent = Math.abs(Math.sin((pi2 / 8) * radius + Math.PI / 2)) / scale + 0.25;
 
                         Location point = location;
                         switch (face) {
@@ -102,15 +159,19 @@ public class ParticleUtils {
                                 break;
                         }
 
-                        if (scale % 2 == 0) {
+                        if(!(point.getX() >= chunkX && point.getX() <= chunkX + 16) || !(point.getZ() >= chunkZ && point.getZ() <= chunkZ + 16)){
+                            continue;
+                        }
+                        if (scale % 1 == 0) {
                             xMarkerDust.spawn(point);
                         } else {
                             yMarkerDust.spawn(point);
                         }
+
                     }
                 }
-                scale -= 0.5;
-                if (scale <= 1) {
+                scale -= 0.4;
+                if (scale <= 0.8) {
                     cancel();
                 }
             }

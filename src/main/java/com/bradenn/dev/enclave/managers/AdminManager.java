@@ -19,11 +19,13 @@ public class AdminManager {
     private final Player player;
     private final Chunk chunk;
     private final RegionModel region;
+    private final ValidationManager validationManager;
 
     public AdminManager(Player player) {
         this.player = player;
         this.chunk = player.getLocation().getChunk();
         this.region = new RegionModel(this.chunk);
+        this.validationManager = new ValidationManager(player);
     }
 
     public void sendHelp() {
@@ -69,6 +71,23 @@ public class AdminManager {
         MessageUtils.send(player, Response.SEND_CLEANUP, total);
     }
 
+    /**
+     * Set the color of an enclave.
+     *
+     * @param playerName The player's username
+     * @param color      The new color.
+     */
+    public void setColor(String playerName, String color) {
+        if (validationManager.playerHasEnclave(playerName)) {
+            if (validationManager.colorIsValid(color)) {
+                Player target = parsePlayer(playerName);
+                PlayerModel playerModel = new PlayerModel(target.getUniqueId());
+                EnclaveModel enclaveModel = playerModel.getEnclave();
+                enclaveModel.setColor(color.toUpperCase());
+            }
+        }
+    }
+
     public void getInfo() {
         EnclaveModel em = region.getEnclave();
 
@@ -99,18 +118,12 @@ public class AdminManager {
      * @param playerName The player's username
      */
     public void disbandEnclave(String playerName) {
-        if (validatePlayer(playerName)) {
+        if (validationManager.playerHasEnclave(playerName)) {
             Player target = parsePlayer(playerName);
             PlayerModel playerModel = new PlayerModel(target.getUniqueId());
             EnclaveModel enclaveModel = playerModel.getEnclave();
-            if (enclaveModel != null) {
-                MessageUtils.send(player, Response.ENCLAVE_DISBANDED, enclaveModel.getName());
-                enclaveModel.disbandEnclave();
-            } else {
-                MessageUtils.send(player, Response.E_PLAYER_NO_ENCLAVE);
-            }
-        } else {
-            MessageUtils.send(player, Response.E_INVALID_PLAYER);
+            MessageUtils.send(player, Response.ENCLAVE_DISBANDED, enclaveModel.getName());
+            enclaveModel.disbandEnclave();
         }
     }
 
@@ -120,32 +133,21 @@ public class AdminManager {
      * @param playerName The player's username
      */
     public void kickPlayer(String playerName) {
-        if (validatePlayer(playerName)) {
+        if (validationManager.playerHasEnclave(playerName)) {
             Player target = parsePlayer(playerName);
             UUID playerUUID = target.getUniqueId();
-            PlayerModel playerModel = new PlayerModel(target.getUniqueId());
-            EnclaveModel enclaveModel = playerModel.getEnclave();
-            if (enclaveModel != null) {
-                if (!enclaveModel.isOwner(playerUUID)) {
-                    enclaveModel.removeMember(playerUUID);
-                    playerModel.clearEnclave();
-                    MessageUtils.send(player, Response.PLAYER_KICKED, target.getName(), enclaveModel.getName());
-                } else {
-                    MessageUtils.send(player, Response.E_KICK_OWNER);
-                }
-            } else {
-                MessageUtils.send(player, Response.E_PLAYER_NO_ENCLAVE);
-            }
-        } else {
-            MessageUtils.send(player, Response.E_INVALID_PLAYER);
-        }
-    }
 
-    /**
-     * Validate Player
-     */
-    private boolean validatePlayer(String name) {
-        return parsePlayer(name) != null;
+            PlayerModel playerModel = new PlayerModel(playerUUID);
+            EnclaveModel enclaveModel = playerModel.getEnclave();
+
+            if (!enclaveModel.isOwner(playerUUID)) {
+                enclaveModel.removeMember(playerUUID);
+                playerModel.clearEnclave();
+                MessageUtils.send(player, Response.PLAYER_KICKED, target.getName(), enclaveModel.getName());
+            } else {
+                MessageUtils.send(player, Response.E_KICK_OWNER);
+            }
+        }
     }
 
     /**
@@ -154,6 +156,5 @@ public class AdminManager {
     private Player parsePlayer(String name) {
         return Bukkit.getPlayer(name);
     }
-
 
 }
