@@ -8,16 +8,17 @@ import com.bradenn.dev.enclave.models.PlayerModel;
 import com.bradenn.dev.enclave.models.RegionModel;
 import com.bradenn.dev.enclave.models.Tag;
 import com.bradenn.dev.enclave.renderers.ParticleRenderer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class EnclaveManager {
 
@@ -106,11 +107,7 @@ public class EnclaveManager {
      * Determine if the enclave is valid.
      */
     public boolean isValid() {
-        if (enclave != null) {
-            return true;
-        }
-
-        return false;
+        return enclave != null;
     }
 
     /**
@@ -334,18 +331,13 @@ public class EnclaveManager {
     public void joinEnclave() {
         UUID enclaveUUID = playerModel.getInvite();
         if (enclaveUUID != null) {
-            if (!enclave.isValid()) {
-                EnclaveModel em = new EnclaveModel(enclaveUUID);
-                em.addMember(playerModel.getPlayerUUID());
-                playerModel.setEnclave(enclaveUUID);
-                MessageUtils.send(player, Response.ENCLAVE_JOINED, em.getDisplayName());
-            } else {
-                MessageUtils.send(player, Response.E_ALREADY_IN_ENCLAVE);
-            }
+            EnclaveModel em = new EnclaveModel(enclaveUUID);
+            em.addMember(playerModel.getPlayerUUID());
+            playerModel.setEnclave(enclaveUUID);
+            MessageUtils.send(player, Response.ENCLAVE_JOINED, em.getDisplayName());
         } else {
             MessageUtils.send(player, Response.E_NO_PENDING);
         }
-
     }
 
     /**

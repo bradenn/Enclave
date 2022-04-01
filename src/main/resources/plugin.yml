@@ -1,8 +1,8 @@
 name: Enclave
 main: com.bradenn.dev.enclave.Main
-version: 1.5.2
+version: 1.5.4
 author: bradencn
-api-version: 1.17
+api-version: 1.18
 website: bradenn.com
 description: Own land and have a good time.
 softdepend: ["PlaceholderAPI"]

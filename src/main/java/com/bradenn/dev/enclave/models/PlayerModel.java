@@ -118,6 +118,9 @@ public class PlayerModel {
      */
     public UUID getInvite() {
         Document invite = player.get("invite", Document.class);
+        if (invite == null) {
+            return null;
+        }
         Date inviteSent = invite.getDate("date");
         if (new Date().getTime() - inviteSent.getTime() <= TimeUnit.SECONDS.toMillis(2000)) {
             String enclaveString = invite.getString("enclave");
