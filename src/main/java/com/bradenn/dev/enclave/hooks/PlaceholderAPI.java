@@ -47,11 +47,15 @@ public class PlaceholderAPI extends PlaceholderExpansion {
 
         if (identifier.equals("name")) {
             PlayerModel playerModel = new PlayerModel(player.getUniqueId());
-            EnclaveModel enclaveModel = playerModel.getEnclave();
-            if (enclaveModel != null) {
-                return enclaveModel.getDisplayName();
+            try {
+                EnclaveModel enclaveModel = playerModel.getEnclave();
+                if (enclaveModel != null) {
+                    return enclaveModel.getDisplayName();
+                }
+                return "";
+            }catch (Exception e){
+                return "";
             }
-            return "";
         }
 
         return null;
