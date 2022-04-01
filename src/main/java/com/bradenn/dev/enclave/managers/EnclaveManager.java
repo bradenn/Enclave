@@ -1,5 +1,7 @@
 package com.bradenn.dev.enclave.managers;
 
+import com.bradenn.dev.enclave.Main;
+import com.bradenn.dev.enclave.Runtime;
 import com.bradenn.dev.enclave.messages.MessageBlock;
 import com.bradenn.dev.enclave.messages.MessageUtils;
 import com.bradenn.dev.enclave.messages.Response;
@@ -8,22 +10,22 @@ import com.bradenn.dev.enclave.models.PlayerModel;
 import com.bradenn.dev.enclave.models.RegionModel;
 import com.bradenn.dev.enclave.models.Tag;
 import com.bradenn.dev.enclave.renderers.ParticleRenderer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-import java.util.regex.Pattern;
+import com.bradenn.dev.enclave.renderers.ParticleUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class EnclaveManager {
 
     private final EnclaveModel enclave;
     private final RegionModel region;
     private final PlayerModel playerModel;
+    private final ValidationManager validationManager;
     private final Player player;
 
     /**
@@ -42,6 +44,7 @@ public class EnclaveManager {
         this.region = new RegionModel(player.getLocation().getChunk());
         this.playerModel = new PlayerModel(player.getUniqueId());
         this.player = player;
+        this.validationManager = new ValidationManager(player);
     }
 
     /**
@@ -107,10 +110,10 @@ public class EnclaveManager {
      */
     public boolean isValid() {
         if (enclave != null) {
-            return true;
+            return enclave.isValid();
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     /**
@@ -129,6 +132,7 @@ public class EnclaveManager {
                 } else {
                     if (playerModel.getEnclave().isOwner(player.getUniqueId())) {
                         region.claimChunk(playerModel.getEnclave().getUUID());
+                        ParticleUtils.chunkClaim(player.getLocation().getChunk(), player.getLocation());
                         MessageUtils.send(player, Response.CHUNK_CLAIMED,
                                 quotaManager.getChunksClaimed(),
                                 quotaManager.getChunkQuota());
@@ -170,6 +174,7 @@ public class EnclaveManager {
      * List the tags of the current enclave.
      */
     public void getTags() {
+
         List<String> diff = new ArrayList<>();
         for (Tag value : Tag.values()) {
             if (!enclave.getTags().contains(value.name())) diff.add(value.name());
@@ -307,7 +312,7 @@ public class EnclaveManager {
     public void inviteMember(String target) {
         if (isOwner()) {
             if (playerModel.hasEnclave()) {
-                if (validatePlayer(target)) {
+                if (validationManager.playerIsValid(target)) {
                     Player targetPlayer = parsePlayer(target);
                     PlayerModel targetPlayerModel = new PlayerModel(targetPlayer.getUniqueId());
                     if (targetPlayerModel.hasEnclave()) {
@@ -317,8 +322,6 @@ public class EnclaveManager {
                         MessageUtils.send(player, Response.INVITE_SENT, targetPlayer.getName());
                         MessageUtils.send(targetPlayer, Response.INVITE_PLAYER, enclave.getName());
                     }
-                } else {
-                    MessageUtils.send(player, Response.E_INVALID_PLAYER);
                 }
             } else {
                 MessageUtils.send(player, Response.E_NO_ENCLAVE);
@@ -332,20 +335,19 @@ public class EnclaveManager {
      * If the player has an enclave invite, let them join.
      */
     public void joinEnclave() {
-        UUID enclaveUUID = playerModel.getInvite();
-        if (enclaveUUID != null) {
-            if (!enclave.isValid()) {
-                EnclaveModel em = new EnclaveModel(enclaveUUID);
+        if (validationManager.inviteIsValid()) {
+            if (enclave == null) {
+                UUID inviteUUID = playerModel.getInvite();
+                EnclaveModel em = new EnclaveModel(inviteUUID);
+
                 em.addMember(playerModel.getPlayerUUID());
-                playerModel.setEnclave(enclaveUUID);
+                playerModel.setEnclave(inviteUUID);
+
                 MessageUtils.send(player, Response.ENCLAVE_JOINED, em.getDisplayName());
             } else {
                 MessageUtils.send(player, Response.E_ALREADY_IN_ENCLAVE);
             }
-        } else {
-            MessageUtils.send(player, Response.E_NO_PENDING);
         }
-
     }
 
     /**
@@ -356,7 +358,7 @@ public class EnclaveManager {
             if (!isOwner()) {
                 enclave.removeMember(playerModel.getPlayerUUID());
                 playerModel.clearEnclave();
-                MessageUtils.send(player, Response.ENCLAVE_LEFT);
+                MessageUtils.send(player, Response.ENCLAVE_LEFT, enclave.getName());
             } else {
                 MessageUtils.send(player, Response.ENCLAVE_CANNOT_LEAVE);
             }
@@ -372,33 +374,11 @@ public class EnclaveManager {
      */
     public void setColor(String color) {
         if (isOwner()) {
-            if (colorIsValid(color)) {
+            if (validationManager.colorIsValid(color)) {
                 enclave.setColor(color.toUpperCase());
                 MessageUtils.send(player, Response.COLOR_CHANGED, color);
-            } else {
-                MessageUtils.send(player, Response.E_INVALID_COLOR);
             }
         }
-    }
-
-    /**
-     * Validate a color input.
-     */
-    private boolean colorIsValid(String color) {
-        Pattern p = Pattern.compile("^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$");
-        List<String> colors = new ArrayList<>();
-        new ArrayList<>(Arrays.asList(ChatColor.values())).forEach(chatColor -> {
-            if (chatColor != ChatColor.MAGIC)
-                colors.add(chatColor.name());
-        });
-        return p.matcher(color).matches() || colors.contains(color.toUpperCase());
-    }
-
-    /**
-     * Validate Player
-     */
-    private boolean validatePlayer(String name) {
-        return parsePlayer(name) != null;
     }
 
     /**
@@ -416,5 +396,6 @@ public class EnclaveManager {
     }
 
     public void showBorders() {
+        Main.runtime.togglePlayerTask(player, Runtime.PlayerTask.SHOW_PARTICLE_BORDER);
     }
 }
