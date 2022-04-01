@@ -21,11 +21,16 @@ public class PlayerEvents implements Listener {
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent e) {
+
         PlayerModel playerModel = new PlayerModel(e.getPlayer().getUniqueId());
-        if (playerModel.getEnclave() != null) {
-            e.setFormat(e.getFormat()
-                .replace("{ENCLAVE_DISPLAYNAME}", playerModel.getEnclave().getDisplayName()));
-        } else {
+        try {
+            if (playerModel.getEnclave() != null) {
+                e.setFormat(e.getFormat()
+                        .replace("{ENCLAVE_DISPLAYNAME}", playerModel.getEnclave().getDisplayName()));
+            } else {
+                e.setFormat(e.getFormat().replace("{ENCLAVE_DISPLAYNAME}", ""));
+            }
+        } catch (Exception ex) {
             e.setFormat(e.getFormat().replace("{ENCLAVE_DISPLAYNAME}", ""));
         }
     }
