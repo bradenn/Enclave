@@ -27,6 +27,9 @@ public class AdminManager {
         this.region = new RegionModel(this.chunk);
         this.validationManager = new ValidationManager(player);
     }
+    public void sendUnknown() {
+        player.sendMessage("Not familiar with that command... Try again.");
+    }
 
     public void sendHelp() {
         MessageBlock adminHelp = new MessageBlock("Admin Commands");
