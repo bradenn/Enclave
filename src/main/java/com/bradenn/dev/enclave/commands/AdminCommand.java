@@ -29,6 +29,9 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
             switch (args.length) {
                 case 1:
                     switch (args[0].toLowerCase()) {
+                        case "help":
+                            adminManager.sendHelp();
+                            break;
                         case "wipe":
                             adminManager.wipeChunk();
                             break;
@@ -48,7 +51,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                             adminManager.cleanupRuntime();
                             break;
                         default:
-                            adminManager.sendHelp();
+                            adminManager.sendUnknown();
                             break;
                     }
                     break;
@@ -61,7 +64,7 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                             adminManager.kickPlayer(args[1]);
                             break;
                         default:
-                            adminManager.sendHelp();
+                            adminManager.sendUnknown();
                             break;
                     }
                     break;
@@ -77,12 +80,12 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
                             // Change the color of an enclave
                             break;
                         default:
-                            adminManager.sendHelp();
+                            adminManager.sendUnknown();
                             break;
                     }
                     break;
                 default:
-                    adminManager.sendHelp();
+                    adminManager.sendUnknown();
                     break;
             }
         }
@@ -96,14 +99,19 @@ public class AdminCommand implements CommandExecutor, TabCompleter {
 
         Map<String, List<String>> commands = new HashMap<>();
 
+        commands.put("help", new ArrayList<>());
         commands.put("wipe", new ArrayList<>());
         commands.put("info", new ArrayList<>());
         commands.put("border", new ArrayList<>());
         commands.put("identifier", new ArrayList<>());
+        commands.put("version", new ArrayList<>());
         commands.put("cleanup", new ArrayList<>());
 
         commands.put("disband", null);
         commands.put("kick", null);
+
+        commands.put("merge", new ArrayList<>());
+        commands.put("color", new ArrayList<>());
 
         switch (args.length) {
             case 1:

@@ -54,8 +54,8 @@ public class EnclaveManager {
         commandInfo.addLine("invite", "[player] Invite a player to your enclave");
         commandInfo.addLine("color", "[color] Change your enclave color");
         commandInfo.addLine("rename", "[name] Change your enclave name");
-        commandInfo.addLine("map", "Get a map of nearby enclaves");
         commandInfo.addLine("claim", "Claim regions for your enclave");
+        commandInfo.addLine("home", "Teleport to your enclave home");
         commandInfo.addLine("unclaim", "Unclaim regions for your enclave");
         commandInfo.addLine("disband", "Disband your enclave");
         commandInfo.addLine("info", "Get info about a region");

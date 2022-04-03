@@ -134,7 +134,8 @@ public class EnclaveCommand implements CommandExecutor, TabCompleter {
         commands.put("unclaim", new ArrayList<>());
         commands.put("invite", null);
         commands.put("rename", new ArrayList<>());
-        commands.put("borders", new ArrayList<>());
+        commands.put("home", new ArrayList<>());
+        commands.put("sethome", new ArrayList<>());
         commands.put("here", new ArrayList<>());
         commands.put("disband", new ArrayList<>());
         commands.put("create", null);
