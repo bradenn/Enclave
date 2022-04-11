@@ -23,3 +23,6 @@ permissions:
   enclave.admin:
     description: Access to overriding all enclave commands and permissions.
     default: op
+  enclave.admin.interact:
+    description: Access to overriding all enclave commands and permissions.
+    default: op

@@ -18,6 +18,7 @@ public class EventUtility {
      */
     public static boolean blockInteractionShouldCancel(Player player, Block block) {
         RegionModel rm = new RegionModel(block.getChunk());
+        if(player.hasPermission("enclave.admin.interact") || player.isOp())   return false;
         if (rm.isClaimed()) return !rm.getEnclave().hasMember(player.getUniqueId());
         return false;
     }

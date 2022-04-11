@@ -6,7 +6,6 @@ import com.bradenn.dev.enclave.models.Tag;
 import com.bradenn.dev.enclave.renderers.ParticleUtils;
 import org.bukkit.Chunk;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -16,17 +15,17 @@ import org.bukkit.util.Vector;
 
 public class InteractionEvents implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler
     public void blockBreakEvent(BlockBreakEvent e) {
         e.setCancelled(EventUtility.blockInteractionShouldCancel(e.getPlayer(), e.getBlock()));
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler
     public void blockPlaceEvent(BlockPlaceEvent e) {
         e.setCancelled(EventUtility.blockInteractionShouldCancel(e.getPlayer(), e.getBlock()));
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler
     public void playerInteractEvent(PlayerInteractEvent e) {
         if (e.getClickedBlock() == null) return;
         e.setCancelled(EventUtility.blockInteractionShouldCancel(e.getPlayer(), e.getClickedBlock()));
