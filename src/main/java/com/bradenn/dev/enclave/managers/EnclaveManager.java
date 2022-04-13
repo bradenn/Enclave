@@ -10,27 +10,22 @@ import com.bradenn.dev.enclave.models.PlayerModel;
 import com.bradenn.dev.enclave.models.RegionModel;
 import com.bradenn.dev.enclave.models.Tag;
 import com.bradenn.dev.enclave.renderers.ParticleRenderer;
-<<<<<<<<< Temporary merge branch 1
 import com.bradenn.dev.enclave.renderers.ParticleUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-=========
->>>>>>>>> Temporary merge branch 2
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-<<<<<<<<< Temporary merge branch 1
-=========
 import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
->>>>>>>>> Temporary merge branch 2
 
 public class EnclaveManager {
 
@@ -118,7 +113,6 @@ public class EnclaveManager {
         player.sendMessage(regionInfo.getMessage());
     }
 
-<<<<<<<<< Temporary merge branch 1
     /**
      * Determine if the enclave is valid.
      */
