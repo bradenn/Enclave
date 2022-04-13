@@ -1,5 +1,7 @@
 package com.bradenn.dev.enclave.managers;
 
+import com.bradenn.dev.enclave.Main;
+import com.bradenn.dev.enclave.Runtime;
 import com.bradenn.dev.enclave.messages.MessageBlock;
 import com.bradenn.dev.enclave.messages.MessageUtils;
 import com.bradenn.dev.enclave.messages.Response;
@@ -8,8 +10,8 @@ import com.bradenn.dev.enclave.models.PlayerModel;
 import com.bradenn.dev.enclave.models.RegionModel;
 import com.bradenn.dev.enclave.models.Tag;
 import com.bradenn.dev.enclave.renderers.ParticleRenderer;
+import com.bradenn.dev.enclave.renderers.ParticleUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -19,12 +21,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 public class EnclaveManager {
 
     private final EnclaveModel enclave;
     private final RegionModel region;
     private final PlayerModel playerModel;
+    private final ValidationManager validationManager;
     private final Player player;
 
     /**
@@ -43,6 +51,7 @@ public class EnclaveManager {
         this.region = new RegionModel(player.getLocation().getChunk());
         this.playerModel = new PlayerModel(player.getUniqueId());
         this.player = player;
+        this.validationManager = new ValidationManager(player);
     }
 
     /**
@@ -54,6 +63,7 @@ public class EnclaveManager {
         commandInfo.addLine("invite", "[player] Invite a player to your enclave");
         commandInfo.addLine("color", "[color] Change your enclave color");
         commandInfo.addLine("rename", "[name] Change your enclave name");
+        commandInfo.addLine("map", "Get a map of nearby enclaves");
         commandInfo.addLine("claim", "Claim regions for your enclave");
         commandInfo.addLine("home", "Teleport to your enclave home");
         commandInfo.addLine("unclaim", "Unclaim regions for your enclave");
@@ -126,6 +136,7 @@ public class EnclaveManager {
                 } else {
                     if (playerModel.getEnclave().isOwner(player.getUniqueId())) {
                         region.claimChunk(playerModel.getEnclave().getUUID());
+                        ParticleUtils.chunkClaim(player.getLocation().getChunk(), player.getLocation());
                         MessageUtils.send(player, Response.CHUNK_CLAIMED,
                                 quotaManager.getChunksClaimed(),
                                 quotaManager.getChunkQuota());

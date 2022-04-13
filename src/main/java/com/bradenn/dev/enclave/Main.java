@@ -5,7 +5,8 @@ import com.bradenn.dev.enclave.commands.EnclaveCommand;
 import com.bradenn.dev.enclave.events.InteractionEvents;
 import com.bradenn.dev.enclave.events.PlayerEvents;
 import com.bradenn.dev.enclave.events.WorldEvents;
-import com.bradenn.dev.enclave.hooks.PlaceholderAPI;
+import com.bradenn.dev.enclave.hooks.DynmapHook;
+import com.bradenn.dev.enclave.hooks.PlaceholderApiHook;
 import com.mongodb.MongoSocketException;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
@@ -63,9 +64,12 @@ public class Main extends JavaPlugin {
 
     private void loadHooks() {
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new PlaceholderAPI(this).register();
+            new PlaceholderApiHook(this).register();
         } else {
             getServer().getLogger().log(Level.WARNING, "Could not find PlaceholderAPI.");
+        }
+        if (Bukkit.getPluginManager().getPlugin("dynmap") != null) {
+            new DynmapHook().reloadAllChunks();
         }
     }
 

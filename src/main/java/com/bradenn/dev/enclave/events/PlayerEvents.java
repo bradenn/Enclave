@@ -21,7 +21,6 @@ public class PlayerEvents implements Listener {
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent e) {
-
         PlayerModel playerModel = new PlayerModel(e.getPlayer().getUniqueId());
         try {
             if (playerModel.getEnclave() != null) {
