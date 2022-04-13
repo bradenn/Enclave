@@ -3,6 +3,7 @@ package com.bradenn.dev.enclave.models;
 import com.bradenn.dev.enclave.Database;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import net.md_5.bungee.api.ChatColor;
@@ -17,12 +18,19 @@ import java.util.function.Consumer;
 
 public class EnclaveModel {
 
+
+
     private final UUID uuid;
     private final Document enclave;
 
     private final MongoCollection<Document> collection = Database.getCollection("enclaves");
     private final MongoCollection<Document> regions = Database.getCollection("regions");
     private final MongoCollection<Document> players = Database.getCollection("players");
+
+    public EnclaveModel(){
+        this.uuid = null;
+        this.enclave = null;
+    }
 
     /**
      * Get an enclave's database document from it's UUID.
@@ -361,6 +369,16 @@ public class EnclaveModel {
             // Return true to signify that the tag has been disabled.
             return true;
         }
+    }
+
+    public List<EnclaveModel> getAllEnclaveModels(){
+        List<EnclaveModel> tempList = new ArrayList<>();
+
+        MongoCursor<Document> cursor = collection.find().iterator();
+        while (cursor.hasNext()) {
+            tempList.add(new EnclaveModel(UUID.fromString((String) cursor.next().get("uuid"))));
+        }
+        return null;
     }
 
     /**

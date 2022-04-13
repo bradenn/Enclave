@@ -1,6 +1,7 @@
 package com.bradenn.dev.enclave.events;
 
 import com.bradenn.dev.enclave.models.PlayerModel;
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -25,7 +26,7 @@ public class PlayerEvents implements Listener {
         if (playerModel.getEnclave() != null) {
             e.setFormat(e.getFormat()
                 .replace("{ENCLAVE_DISPLAYNAME}", playerModel.getEnclave().getDisplayName()));
-        } else {
+            } else {
             e.setFormat(e.getFormat().replace("{ENCLAVE_DISPLAYNAME}", ""));
         }
     }
