@@ -2,13 +2,18 @@ package com.bradenn.dev.enclave.models;
 
 import com.bradenn.dev.enclave.Database;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
+import javafx.scene.layout.Region;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class RegionModel {
@@ -18,6 +23,24 @@ public class RegionModel {
     private final Document region;
 
     private final MongoCollection<Document> collection = Database.getCollection("regions");
+
+    public RegionModel(){
+        this.world = null;
+        this.chunk = null;
+        this.region = null;
+    }
+
+    public List<RegionModel> getRegionModels(){
+        List<RegionModel> tempList = new ArrayList<>();
+
+        MongoCursor<Document> cursor = collection.find().iterator();
+        while (cursor.hasNext()) {
+            Document obj = cursor.next();
+            tempList.add(new RegionModel(Bukkit.getWorld(obj.getString("world"))
+                    .getChunkAt(obj.getInteger("x"), obj.getInteger("z"))));
+        }
+        return tempList;
+    }
 
     /**
      * @param chunk Bukkit Chunk
@@ -122,6 +145,14 @@ public class RegionModel {
                 .append("enclave", enclaveUUID.toString())
                 .append("date", new Date());
         this.collection.insertOne(chunkDoc);
+    }
+
+    public Chunk getChunk() {
+        return chunk;
+    }
+
+    public World getWorld() {
+        return world;
     }
 
     /**
