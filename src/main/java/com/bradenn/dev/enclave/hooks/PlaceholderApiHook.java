@@ -4,14 +4,15 @@ import com.bradenn.dev.enclave.Main;
 import com.bradenn.dev.enclave.models.EnclaveModel;
 import com.bradenn.dev.enclave.models.PlayerModel;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class PlaceholderAPI extends PlaceholderExpansion {
+public class PlaceholderApiHook extends PlaceholderExpansion {
 
     private final Main plugin;
 
-    public PlaceholderAPI(Main plugin) {
+    public PlaceholderApiHook(Main plugin) {
         this.plugin = plugin;
     }
 
@@ -56,6 +57,14 @@ public class PlaceholderAPI extends PlaceholderExpansion {
             }catch (Exception e){
                 return "";
             }
+        }
+        if (identifier.equals("name2")) {
+            PlayerModel playerModel = new PlayerModel(player.getUniqueId());
+            EnclaveModel enclaveModel = playerModel.getEnclave();
+            if (enclaveModel != null) {
+                return playerModel.getEnclave().getDisplayName() + " " + ChatColor.GRAY + ":";
+            }
+            return "";
         }
 
         return null;

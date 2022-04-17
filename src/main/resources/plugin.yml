@@ -5,7 +5,7 @@ author: bradencn
 api-version: 1.18
 website: bradenn.com
 description: Own land and have a good time.
-softdepend: ["PlaceholderAPI"]
+softdepend: ["PlaceholderAPI","dynmap"]
 commands:
   enclave:
     description: Interact with enclaves.
