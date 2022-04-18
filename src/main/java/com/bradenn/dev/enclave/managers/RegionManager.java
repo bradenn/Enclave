@@ -3,6 +3,7 @@ package com.bradenn.dev.enclave.managers;
 import com.bradenn.dev.enclave.messages.MessageUtils;
 import com.bradenn.dev.enclave.models.RegionModel;
 import com.bradenn.dev.enclave.renderers.EnclaveMap;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -20,6 +21,8 @@ public class RegionManager {
 
         assert mm != null;
         mm.setMapView(mv);
+        ChatColor cc = ChatColor.of("#0a84ff");
+        mm.setDisplayName("§aEnclave Map");
         newMap.setItemMeta(mm);
 
         mv.addRenderer(new EnclaveMap());
