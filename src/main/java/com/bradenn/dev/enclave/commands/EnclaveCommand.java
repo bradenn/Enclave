@@ -1,6 +1,7 @@
 package com.bradenn.dev.enclave.commands;
 
 import com.bradenn.dev.enclave.managers.EnclaveManager;
+import com.bradenn.dev.enclave.managers.RegionManager;
 import com.bradenn.dev.enclave.models.Tag;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -86,6 +87,9 @@ public class EnclaveCommand implements CommandExecutor, TabCompleter {
                                 break;
                             case "tags":
                                 enclaveManager.getTags();
+                                break;
+                            case "map":
+                                RegionManager.showBorders(player);
                                 break;
                             default:
                                 enclaveManager.sendHelp();
